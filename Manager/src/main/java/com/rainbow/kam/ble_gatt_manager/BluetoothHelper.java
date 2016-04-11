@@ -16,7 +16,7 @@ import android.widget.Toast;
  * Created by kam6512 on 2015-11-20.
  */
 public class BluetoothHelper {
-
+    public static final boolean IS_BUILD_VERSION_LM = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int RESULT_OK = -1;
 

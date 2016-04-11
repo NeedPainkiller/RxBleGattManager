@@ -2,6 +2,7 @@ package com.rainbow.kam.ble_gatt_manager;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.util.Log;
 
 /**
  * Created by kam6512 on 2015-10-29.
@@ -42,13 +43,16 @@ public interface GattCustomCallbacks {
 
     class GattCallbacks implements GattCustomCallbacks {
 
+        private static final String TAG = "GattCallbacks";
+
+
         @Override public void onDeviceConnected() {
 
         }
 
 
         @Override public void onDeviceConnectFail(Exception e) {
-
+            Log.e(TAG, "onDeviceConnectFail : " + e.getMessage());
         }
 
 
@@ -58,7 +62,7 @@ public interface GattCustomCallbacks {
 
 
         @Override public void onDeviceDisconnectFail(Exception e) {
-
+            Log.e(TAG, "onDeviceDisconnectFail : " + e.getMessage());
         }
 
 
@@ -68,7 +72,7 @@ public interface GattCustomCallbacks {
 
 
         @Override public void onServicesNotFound(Exception e) {
-
+            Log.e(TAG, "onServicesNotFound : " + e.getMessage());
         }
 
 
@@ -88,7 +92,7 @@ public interface GattCustomCallbacks {
 
 
         @Override public void onSetNotificationFail(Exception e) {
-
+            Log.e(TAG, "onSetNotificationFail : " + e.getMessage());
         }
 
 
@@ -98,7 +102,7 @@ public interface GattCustomCallbacks {
 
 
         @Override public void onReadFail(Exception e) {
-
+            Log.e(TAG, "onReadFail : " + e.getMessage());
         }
 
 
@@ -108,7 +112,7 @@ public interface GattCustomCallbacks {
 
 
         @Override public void onWriteFail(Exception e) {
-
+            Log.e(TAG, "onWriteFail : " + e.getMessage());
         }
 
 

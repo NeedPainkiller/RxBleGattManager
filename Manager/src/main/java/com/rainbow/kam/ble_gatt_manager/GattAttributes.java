@@ -17,6 +17,7 @@
 package com.rainbow.kam.ble_gatt_manager;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.common.collect.Maps;
@@ -25,14 +26,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class GattAttributes {
+class GattAttributes {
 
-    private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB";
+    private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB".toLowerCase();
 
-    public final static String CLIENT_CHARACTERISTIC_CONFIG = "00002902" + UUID_LABEL;
+    public final static String CLIENT_CHARACTERISTIC_CONFIG = ("00002902" + UUID_LABEL).toLowerCase();
 
-    public final static String BATTERY_SERVICE_UUID = "0000180F" + UUID_LABEL;
-    public final static String BATTERY_CHARACTERISTIC_UUID = "00002A19" + UUID_LABEL;
+    public final static String BATTERY_SERVICE_UUID = ("0000180F" + UUID_LABEL).toLowerCase();
+    public final static String BATTERY_CHARACTERISTIC_UUID = ("00002A19" + UUID_LABEL).toLowerCase();
 
 
     private final static Map<String, String> SERVICES = Maps.newHashMap();
@@ -47,8 +48,11 @@ public class GattAttributes {
 
 
     public static String resolveServiceName(final String uuid) {
+        Log.e("UUID", uuid);
         String res = SERVICES.get(uuid);
         if (res != null) {
+
+            Log.e("res", res);
             return res;
         }
         return UNKNOWN;

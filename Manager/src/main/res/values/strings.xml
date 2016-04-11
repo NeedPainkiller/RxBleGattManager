@@ -1,7 +1,6 @@
 <resources>
     <string name="bluetooth.on">블루투스 On</string>
     <string name="bluetooth.not.init">블루투스가 시작되지 않았습니다.\n 블루투스를 시작해야 합니다.</string>
-    <string name="bluetooth.fail">기기가 블루투스를 지원하지 않습니다</string>
 
     <string name="permission.request"><![CDATA[[권한] 탭 -> [위치] 권한을 허용해주십시오]]></string>
     <string name="permission.thanks">권한 획득, 감사합니다.</string>

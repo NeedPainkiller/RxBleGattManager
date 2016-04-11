@@ -30,15 +30,15 @@ public class GattManager {
 
     private final static String TAG = GattManager.class.getSimpleName();
 
+    private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
 
-    private static final long RSSI_UPDATE_TIME_INTERVAL = 3;
     private static final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
     private static final UUID BATTERY_SERVICE_UUID = UUID.fromString(GattAttributes.BATTERY_SERVICE_UUID);
     private static final UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(GattAttributes.BATTERY_CHARACTERISTIC_UUID);
 
     private final Context context;
 
-    private GattCustomCallbacks gattCustomCallbacks;
+    private final GattCustomCallbacks gattCustomCallbacks;
 
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
@@ -78,8 +78,9 @@ public class GattManager {
             bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
             if (bluetoothDevice == null) {
                 gattCustomCallbacks.onDeviceConnectFail(new NullPointerException("RemoteDevice is not available"));
+            } else {
+                bluetoothGatt = bluetoothDevice.connectGatt(context, false, bluetoothGattCallback);
             }
-            bluetoothGatt = bluetoothDevice.connectGatt(context, false, bluetoothGattCallback);
         }
     }
 
@@ -126,13 +127,14 @@ public class GattManager {
     }
 
 
+    @DebugLog
     private void startServiceDiscovery() {
         bluetoothGatt.discoverServices();
     }
 
 
     @DebugLog
-    public void setNotification(BluetoothGattCharacteristic notificationForCharacteristic, boolean enabled) {
+    private void setNotification(BluetoothGattCharacteristic notificationForCharacteristic, boolean enabled) {
 
         Observable.just(notificationForCharacteristic)
                 .map(characteristic -> {
@@ -154,7 +156,7 @@ public class GattManager {
 
     @DebugLog
     public void readValue(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-        bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
+            bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
     }
 
 
@@ -162,10 +164,14 @@ public class GattManager {
     public void writeValue(final BluetoothGattCharacteristic bluetoothGattCharacteristic, final byte[] dataToWrite) {
         Observable
                 .create(subscriber -> {
-                    if (dataToWrite.length != 0) {
-                        subscriber.onNext(bluetoothGattCharacteristic);
+                    if (bluetoothGattCharacteristic != null) {
+                        if (dataToWrite.length != 0) {
+                            subscriber.onNext(bluetoothGattCharacteristic);
+                        } else {
+                            subscriber.onError(new Exception("data is Null or Empty"));
+                        }
                     } else {
-                        subscriber.onError(new Exception("data is Null or Empty"));
+                        subscriber.onError(new Exception("write Characteristic is null"));
                     }
                 })
                 .map(bytes -> {
@@ -182,6 +188,7 @@ public class GattManager {
     }
 
 
+    @DebugLog
     public void setNotification(UUID notificationUUID, boolean enabled) {
         if (notificationCharacteristic == null || !notificationCharacteristic.getUuid().equals(notificationUUID)) {
             notificationCharacteristic = getCharacteristic(notificationUUID);
@@ -190,11 +197,13 @@ public class GattManager {
     }
 
 
+    @DebugLog
     public void readBatteryValue() {
         readValue(bluetoothGatt.getService(BATTERY_SERVICE_UUID).getCharacteristic(BATTERY_CHARACTERISTIC_UUID));
     }
 
 
+    @DebugLog
     public void writeValue(final UUID writeUUID, final byte[] dataToWrite) {
         if (writeCharacteristic == null || !writeCharacteristic.getUuid().equals(writeUUID)) {
             writeCharacteristic = getCharacteristic(writeUUID);
@@ -224,7 +233,6 @@ public class GattManager {
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt bluetoothGatt, int status, int newState) {
-
             if (newState == BluetoothProfile.STATE_CONNECTED) {
 
                 startServiceDiscovery();
@@ -233,17 +241,16 @@ public class GattManager {
 
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 
-                gattCustomCallbacks.onDeviceDisconnected();
-
                 bluetoothGatt.close();
 
-                gattCustomCallbacks = null;
+                gattCustomCallbacks.onDeviceDisconnected();
+//             gattCustomCallbacks = null;
             }
             readRssiValue();
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onServicesDiscovered(BluetoothGatt bluetoothGatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onServicesFound(bluetoothGatt);
@@ -270,13 +277,11 @@ public class GattManager {
         @DebugLog @Override
         public void onCharacteristicChanged(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic) {
             gattCustomCallbacks.onDeviceNotify(characteristic);
-            Log.i(TAG, "CharacteristicChanged");
         }
 
 
         @DebugLog @Override
         public void onCharacteristicWrite(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic, int status) {
-
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onWriteSuccess();
                 Log.i(TAG, "CharacteristicWrite SUCCESS " + characteristic.getUuid().toString());
@@ -287,7 +292,7 @@ public class GattManager {
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onReadRemoteRssi(BluetoothGatt bluetoothGatt, int rssi, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onRSSIUpdate(rssi);
@@ -297,14 +302,18 @@ public class GattManager {
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onDescriptorWrite(BluetoothGatt bluetoothGatt, BluetoothGattDescriptor descriptor, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
+
                 gattCustomCallbacks.onSetNotificationSuccess();
+
+                Log.i(TAG, "DescriptorWrite SUCCESS " + descriptor.getCharacteristic().getUuid().toString() + " \n " + descriptor.getUuid().toString());
+
                 if (descriptor.equals(notificationDescriptor)) {
                     gattCustomCallbacks.onDeviceReady();
                 }
-                Log.i(TAG, "DescriptorWrite SUCCESS " + descriptor.getCharacteristic().getUuid().toString() + " \n " + descriptor.getUuid().toString());
+
             } else {
                 gattCustomCallbacks.onSetNotificationFail(new Exception("DescriptorWrite FAIL"));
             }
