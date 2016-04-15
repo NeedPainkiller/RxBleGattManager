@@ -5,6 +5,4 @@
     <string name="permission.request"><![CDATA[[권한] 탭 -> [위치] 권한을 허용해주십시오]]></string>
     <string name="permission.thanks">권한 획득, 감사합니다.</string>
     <string name="permission.denial">권한의 획득을 거부</string>
-
-
 </resources>

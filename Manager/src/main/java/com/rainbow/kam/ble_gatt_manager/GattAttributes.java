@@ -17,7 +17,6 @@
 package com.rainbow.kam.ble_gatt_manager;
 
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.google.common.collect.Maps;
@@ -26,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-class GattAttributes {
+public class GattAttributes {
 
     private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB".toLowerCase();
 
@@ -43,16 +42,13 @@ class GattAttributes {
     private final static String UNKNOWN = "UNKNOWN";
 
     private final static List<Integer> FORMAT_LIST;
-    public static final SparseArray<String> BOND_LIST = new SparseArray<>();
-    public static final SparseArray<String> TYPE_LIST = new SparseArray<>();
+    private final static SparseArray<String> BOND_LIST = new SparseArray<>();
+    private final static SparseArray<String> TYPE_LIST = new SparseArray<>();
 
 
     public static String resolveServiceName(final String uuid) {
-        Log.e("UUID", uuid);
         String res = SERVICES.get(uuid);
         if (res != null) {
-
-            Log.e("res", res);
             return res;
         }
         return UNKNOWN;
@@ -83,6 +79,16 @@ class GattAttributes {
             if ((format & properties) != 0) return format;
         }
         return 0;
+    }
+
+
+    public static SparseArray<String> getBondList() {
+        return BOND_LIST;
+    }
+
+
+    public static SparseArray<String> getTypeList() {
+        return TYPE_LIST;
     }
 
 

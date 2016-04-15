@@ -1,6 +1,7 @@
 
 package com.rainbow.kam.ble_gatt_manager;
 
+import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
 
@@ -32,11 +32,11 @@ public class GattManager {
 
     private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
 
-    private static final UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
-    private static final UUID BATTERY_SERVICE_UUID = UUID.fromString(GattAttributes.BATTERY_SERVICE_UUID);
-    private static final UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(GattAttributes.BATTERY_CHARACTERISTIC_UUID);
+    private final static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
+    private final static UUID BATTERY_SERVICE_UUID = UUID.fromString(GattAttributes.BATTERY_SERVICE_UUID);
+    private final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(GattAttributes.BATTERY_CHARACTERISTIC_UUID);
 
-    private final Context context;
+    private final Application context;
 
     private final GattCustomCallbacks gattCustomCallbacks;
 
@@ -52,8 +52,8 @@ public class GattManager {
     private BluetoothGattCharacteristic notificationCharacteristic;
 
 
-    public GattManager(Context context, GattCustomCallbacks gattCustomCallbacks) {
-        this.context = context;
+    public GattManager(Application application, GattCustomCallbacks gattCustomCallbacks) {
+        this.context = application;
         this.gattCustomCallbacks = gattCustomCallbacks;
 
         if (bluetoothManager == null || bluetoothAdapter == null) {
@@ -106,7 +106,8 @@ public class GattManager {
     public boolean isConnected() {
         List<BluetoothDevice> bluetoothDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         for (BluetoothDevice bluetoothDeviceItem : bluetoothDevices) {
-            if (this.bluetoothDevice != null && this.bluetoothDevice.getAddress().equals(bluetoothDeviceItem.getAddress())) {
+            if (bluetoothDevice != null &&
+                    bluetoothDevice.getAddress().equals(bluetoothDeviceItem.getAddress())) {
                 return true;
             }
         }
@@ -127,14 +128,12 @@ public class GattManager {
     }
 
 
-    @DebugLog
     private void startServiceDiscovery() {
         bluetoothGatt.discoverServices();
     }
 
 
-    @DebugLog
-    private void setNotification(BluetoothGattCharacteristic notificationForCharacteristic, boolean enabled) {
+    public void setNotification(BluetoothGattCharacteristic notificationForCharacteristic, boolean enabled) {
 
         Observable.just(notificationForCharacteristic)
                 .map(characteristic -> {
@@ -148,19 +147,17 @@ public class GattManager {
                     bluetoothGatt.writeDescriptor(notificationDescriptor);
                     gattCustomCallbacks.onSetNotificationSuccess();
                 }, throwable -> {
-                    gattCustomCallbacks.onSetNotificationFail(new Exception("WriteDescriptor FAIL"));
+                    gattCustomCallbacks.onSetNotificationFail(new Exception("WriteDescriptor FAIL : " + throwable.getMessage()));
                 })
                 .unsubscribe();
     }
 
 
-    @DebugLog
     public void readValue(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-            bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
+        bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
     }
 
 
-    @DebugLog
     public void writeValue(final BluetoothGattCharacteristic bluetoothGattCharacteristic, final byte[] dataToWrite) {
         Observable
                 .create(subscriber -> {
@@ -188,7 +185,6 @@ public class GattManager {
     }
 
 
-    @DebugLog
     public void setNotification(UUID notificationUUID, boolean enabled) {
         if (notificationCharacteristic == null || !notificationCharacteristic.getUuid().equals(notificationUUID)) {
             notificationCharacteristic = getCharacteristic(notificationUUID);
@@ -197,13 +193,11 @@ public class GattManager {
     }
 
 
-    @DebugLog
     public void readBatteryValue() {
         readValue(bluetoothGatt.getService(BATTERY_SERVICE_UUID).getCharacteristic(BATTERY_CHARACTERISTIC_UUID));
     }
 
 
-    @DebugLog
     public void writeValue(final UUID writeUUID, final byte[] dataToWrite) {
         if (writeCharacteristic == null || !writeCharacteristic.getUuid().equals(writeUUID)) {
             writeCharacteristic = getCharacteristic(writeUUID);
@@ -212,7 +206,6 @@ public class GattManager {
     }
 
 
-    @DebugLog
     private BluetoothGattCharacteristic getCharacteristic(UUID uuid) {
 
         List<BluetoothGattService> serviceList = bluetoothGatt.getServices();
@@ -250,7 +243,7 @@ public class GattManager {
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onServicesDiscovered(BluetoothGatt bluetoothGatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onServicesFound(bluetoothGatt);
@@ -262,7 +255,7 @@ public class GattManager {
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onCharacteristicRead(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onReadSuccess(characteristic);
@@ -274,13 +267,13 @@ public class GattManager {
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onCharacteristicChanged(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic) {
             gattCustomCallbacks.onDeviceNotify(characteristic);
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onCharacteristicWrite(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onWriteSuccess();
@@ -292,7 +285,7 @@ public class GattManager {
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onReadRemoteRssi(BluetoothGatt bluetoothGatt, int rssi, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onRSSIUpdate(rssi);
@@ -302,7 +295,7 @@ public class GattManager {
         }
 
 
-        @DebugLog @Override
+        @Override
         public void onDescriptorWrite(BluetoothGatt bluetoothGatt, BluetoothGattDescriptor descriptor, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
 
