@@ -82,13 +82,13 @@ public class GattAttributes {
     }
 
 
-    public static SparseArray<String> getBondList() {
-        return BOND_LIST;
+    public static String getBond(int bond) {
+        return BOND_LIST.get(bond,UNKNOWN);
     }
 
 
-    public static SparseArray<String> getTypeList() {
-        return TYPE_LIST;
+    public static String getType(int type) {
+        return TYPE_LIST.get(type,UNKNOWN);
     }
 
 
