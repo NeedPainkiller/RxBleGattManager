@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.rainbow.kam.ble_gatt_manager;
+package com.rainbow.kam.ble_gatt_manager.legacy;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.util.SparseArray;
