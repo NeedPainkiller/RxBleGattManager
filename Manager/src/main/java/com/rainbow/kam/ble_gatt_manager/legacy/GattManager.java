@@ -170,6 +170,17 @@ public class GattManager {
     }
 
 
+    public boolean isNotificationEnabled(BluetoothGattCharacteristic notificationCharacteristic) {
+        byte[] descriptorValue = notificationCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID).getValue();
+        if (descriptorValue == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
+            return true;
+        } else if (descriptorValue == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
+            return false;
+        }
+        return false;
+    }
+
+
     public void readValue(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
     }
