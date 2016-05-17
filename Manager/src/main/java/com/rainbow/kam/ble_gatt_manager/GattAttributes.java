@@ -17,22 +17,27 @@
 package com.rainbow.kam.ble_gatt_manager;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 import android.util.SparseArray;
 
 import com.google.common.collect.Maps;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class GattAttributes {
 
-    private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB".toLowerCase();
+    private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB";
 
-    public final static String CLIENT_CHARACTERISTIC_CONFIG = ("00002902" + UUID_LABEL).toLowerCase();
+    public final static String CLIENT_CHARACTERISTIC_CONFIG = ("00002902" + UUID_LABEL);
 
-    public final static String BATTERY_SERVICE_UUID = ("0000180F" + UUID_LABEL).toLowerCase();
-    public final static String BATTERY_CHARACTERISTIC_UUID = ("00002A19" + UUID_LABEL).toLowerCase();
+    public final static String BATTERY_SERVICE_UUID = ("0000180F" + UUID_LABEL);
+    public final static String BATTERY_CHARACTERISTIC_UUID = ("00002A19" + UUID_LABEL);
+
+    public final static String SERVICE_TYPE_PRIMARY = "PRIMARY";
+    public final static String SERVICE_TYPE_SECONDARY = "SECONDARY";
 
 
     private final static Map<String, String> SERVICES = Maps.newHashMap();
@@ -47,7 +52,7 @@ public class GattAttributes {
 
 
     public static String resolveServiceName(final String uuid) {
-        String res = SERVICES.get(uuid);
+        String res = SERVICES.get(uuid.toUpperCase(Locale.getDefault()));
         if (res != null) {
             return res;
         }
@@ -56,7 +61,7 @@ public class GattAttributes {
 
 
     public static String resolveCharacteristicName(final String uuid) {
-        String res = CHARACTERISTICS.get(uuid);
+        String res = CHARACTERISTICS.get(uuid.toUpperCase(Locale.getDefault()));
         if (res != null) {
             return res;
         }
@@ -67,6 +72,11 @@ public class GattAttributes {
     public static String resolveValueTypeDescription(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         Integer format = getValueFormat(bluetoothGattCharacteristic);
         return VALUE_FORMATS.get(format, UNKNOWN);
+    }
+
+
+    public static String resolveServiceType(int serviceType) {
+        return (serviceType == BluetoothGattService.SERVICE_TYPE_PRIMARY) ? SERVICE_TYPE_PRIMARY : SERVICE_TYPE_SECONDARY;
     }
 
 
@@ -99,104 +109,104 @@ public class GattAttributes {
         SERVICES.put("00001805" + UUID_LABEL, "Current Time Service");
         SERVICES.put("00001818" + UUID_LABEL, "Cycling Power");
         SERVICES.put("00001816" + UUID_LABEL, "Cycling Speed and Cadence");
-        SERVICES.put("0000180a" + UUID_LABEL, "Device Information");
+        SERVICES.put("0000180A" + UUID_LABEL, "Device Information");
         SERVICES.put("00001800" + UUID_LABEL, "Generic Access");
         SERVICES.put("00001801" + UUID_LABEL, "Generic Attribute");
         SERVICES.put("00001808" + UUID_LABEL, "Glucose");
         SERVICES.put("00001809" + UUID_LABEL, "Health Thermometer");
-        SERVICES.put("0000180d" + UUID_LABEL, "Heart Rate");
+        SERVICES.put("0000180D" + UUID_LABEL, "Heart Rate");
         SERVICES.put("00001812" + UUID_LABEL, "Human Interface Device");
         SERVICES.put("00001802" + UUID_LABEL, "Immediate Alert");
         SERVICES.put("00001803" + UUID_LABEL, "Link Loss");
         SERVICES.put("00001819" + UUID_LABEL, "Location and Navigation");
         SERVICES.put("00001807" + UUID_LABEL, "Next DST Change Service");
-        SERVICES.put("0000180e" + UUID_LABEL, "Phone Alert Status Service");
+        SERVICES.put("0000180E" + UUID_LABEL, "Phone Alert Status Service");
         SERVICES.put("00001806" + UUID_LABEL, "Reference Time Update Service");
         SERVICES.put("00001814" + UUID_LABEL, "Running Speed and Cadence");
         SERVICES.put("00001813" + UUID_LABEL, "Scan Parameters");
         SERVICES.put("00001804" + UUID_LABEL, "Tx Power");
 
-        CHARACTERISTICS.put("00002a43" + UUID_LABEL, "Alert Category ID");
-        CHARACTERISTICS.put("00002a42" + UUID_LABEL, "Alert Category ID Bit Mask");
-        CHARACTERISTICS.put("00002a06" + UUID_LABEL, "Alert Level");
-        CHARACTERISTICS.put("00002a44" + UUID_LABEL, "Alert Notification Control Point");
-        CHARACTERISTICS.put("00002a3f" + UUID_LABEL, "Alert Status");
-        CHARACTERISTICS.put("00002a01" + UUID_LABEL, "Appearance");
+        CHARACTERISTICS.put("00002A43" + UUID_LABEL, "Alert Category ID");
+        CHARACTERISTICS.put("00002A42" + UUID_LABEL, "Alert Category ID Bit Mask");
+        CHARACTERISTICS.put("00002A06" + UUID_LABEL, "Alert Level");
+        CHARACTERISTICS.put("00002A44" + UUID_LABEL, "Alert Notification Control Point");
+        CHARACTERISTICS.put("00002A3F" + UUID_LABEL, "Alert Status");
+        CHARACTERISTICS.put("00002A01" + UUID_LABEL, "Appearance");
         CHARACTERISTICS.put(BATTERY_CHARACTERISTIC_UUID, "Battery Level");
-        CHARACTERISTICS.put("00002a49" + UUID_LABEL, "Blood Pressure Feature");
-        CHARACTERISTICS.put("00002a35" + UUID_LABEL, "Blood Pressure Measurement");
-        CHARACTERISTICS.put("00002a38" + UUID_LABEL, "Body Sensor Location");
-        CHARACTERISTICS.put("00002a22" + UUID_LABEL, "Boot Keyboard Input Report");
-        CHARACTERISTICS.put("00002a32" + UUID_LABEL, "Boot Keyboard Output Report");
-        CHARACTERISTICS.put("00002a33" + UUID_LABEL, "Boot Mouse Input Report");
-        CHARACTERISTICS.put("00002a5c" + UUID_LABEL, "CSC Feature");
-        CHARACTERISTICS.put("00002a5b" + UUID_LABEL, "CSC Measurement");
-        CHARACTERISTICS.put("00002a2b" + UUID_LABEL, "Current Time");
-        CHARACTERISTICS.put("00002a66" + UUID_LABEL, "Cycling Power Control Point");
-        CHARACTERISTICS.put("00002a65" + UUID_LABEL, "Cycling Power Feature");
-        CHARACTERISTICS.put("00002a63" + UUID_LABEL, "Cycling Power Measurement");
-        CHARACTERISTICS.put("00002a64" + UUID_LABEL, "Cycling Power Vector");
-        CHARACTERISTICS.put("00002a08" + UUID_LABEL, "Date Time");
-        CHARACTERISTICS.put("00002a0a" + UUID_LABEL, "Day Date Time");
-        CHARACTERISTICS.put("00002a09" + UUID_LABEL, "Day of Week");
-        CHARACTERISTICS.put("00002a00" + UUID_LABEL, "Device Name");
-        CHARACTERISTICS.put("00002a0d" + UUID_LABEL, "DST Offset");
-        CHARACTERISTICS.put("00002a0c" + UUID_LABEL, "Exact Time 256");
-        CHARACTERISTICS.put("00002a26" + UUID_LABEL, "Firmware Revision String");
-        CHARACTERISTICS.put("00002a51" + UUID_LABEL, "Glucose Feature");
-        CHARACTERISTICS.put("00002a18" + UUID_LABEL, "Glucose Measurement");
-        CHARACTERISTICS.put("00002a34" + UUID_LABEL, "Glucose Measurement Context");
-        CHARACTERISTICS.put("00002a27" + UUID_LABEL, "Hardware Revision String");
-        CHARACTERISTICS.put("00002a39" + UUID_LABEL, "Heart Rate Control Point");
-        CHARACTERISTICS.put("00002a37" + UUID_LABEL, "Heart Rate Measurement");
-        CHARACTERISTICS.put("00002a4c" + UUID_LABEL, "HID Control Point");
-        CHARACTERISTICS.put("00002a4a" + UUID_LABEL, "HID Information");
-        CHARACTERISTICS.put("00002a2a" + UUID_LABEL, "IEEE 11073-20601 Regulatory Certification Data List");
-        CHARACTERISTICS.put("00002a36" + UUID_LABEL, "Intermediate Cuff Pressure");
-        CHARACTERISTICS.put("00002a1e" + UUID_LABEL, "Intermediate Temperature");
-        CHARACTERISTICS.put("00002a6b" + UUID_LABEL, "LN Control Point");
-        CHARACTERISTICS.put("00002a6a" + UUID_LABEL, "LN Feature");
-        CHARACTERISTICS.put("00002a0f" + UUID_LABEL, "Local Time Information");
-        CHARACTERISTICS.put("00002a67" + UUID_LABEL, "Location and Speed");
-        CHARACTERISTICS.put("00002a29" + UUID_LABEL, "Manufacturer Name String");
-        CHARACTERISTICS.put("00002a21" + UUID_LABEL, "Measurement Interval");
-        CHARACTERISTICS.put("00002a24" + UUID_LABEL, "Model Number String");
-        CHARACTERISTICS.put("00002a68" + UUID_LABEL, "Navigation");
-        CHARACTERISTICS.put("00002a46" + UUID_LABEL, "New Alert");
-        CHARACTERISTICS.put("00002a04" + UUID_LABEL, "Peripheral Preferred Connection Parameters");
-        CHARACTERISTICS.put("00002a02" + UUID_LABEL, "Peripheral Privacy Flag");
-        CHARACTERISTICS.put("00002a50" + UUID_LABEL, "PnP ID");
-        CHARACTERISTICS.put("00002a69" + UUID_LABEL, "Position Quality");
-        CHARACTERISTICS.put("00002a4e" + UUID_LABEL, "Protocol Mode");
-        CHARACTERISTICS.put("00002a03" + UUID_LABEL, "Reconnection Address");
-        CHARACTERISTICS.put("00002a52" + UUID_LABEL, "Record Access Control Point");
-        CHARACTERISTICS.put("00002a14" + UUID_LABEL, "Reference Time Information");
-        CHARACTERISTICS.put("00002a4d" + UUID_LABEL, "Report");
-        CHARACTERISTICS.put("00002a4b" + UUID_LABEL, "Report Map");
-        CHARACTERISTICS.put("00002a40" + UUID_LABEL, "Ringer Control Point");
-        CHARACTERISTICS.put("00002a41" + UUID_LABEL, "Ringer Setting");
-        CHARACTERISTICS.put("00002a54" + UUID_LABEL, "RSC Feature");
-        CHARACTERISTICS.put("00002a53" + UUID_LABEL, "RSC Measurement");
-        CHARACTERISTICS.put("00002a55" + UUID_LABEL, "SC Control Point");
-        CHARACTERISTICS.put("00002a4f" + UUID_LABEL, "Scan Interval Window");
-        CHARACTERISTICS.put("00002a31" + UUID_LABEL, "Scan Refresh");
-        CHARACTERISTICS.put("00002a5d" + UUID_LABEL, "Sensor Location");
-        CHARACTERISTICS.put("00002a25" + UUID_LABEL, "Serial Number String");
-        CHARACTERISTICS.put("00002a05" + UUID_LABEL, "Service Changed");
-        CHARACTERISTICS.put("00002a28" + UUID_LABEL, "Software Revision String");
-        CHARACTERISTICS.put("00002a47" + UUID_LABEL, "Supported New Alert Category");
-        CHARACTERISTICS.put("00002a48" + UUID_LABEL, "Supported Unread Alert Category");
-        CHARACTERISTICS.put("00002a23" + UUID_LABEL, "System ID");
-        CHARACTERISTICS.put("00002a1c" + UUID_LABEL, "Temperature Measurement");
-        CHARACTERISTICS.put("00002a1d" + UUID_LABEL, "Temperature Type");
-        CHARACTERISTICS.put("00002a12" + UUID_LABEL, "Time Accuracy");
-        CHARACTERISTICS.put("00002a13" + UUID_LABEL, "Time Source");
-        CHARACTERISTICS.put("00002a16" + UUID_LABEL, "Time Update Control Point");
-        CHARACTERISTICS.put("00002a17" + UUID_LABEL, "Time Update State");
-        CHARACTERISTICS.put("00002a11" + UUID_LABEL, "Time with DST");
-        CHARACTERISTICS.put("00002a0e" + UUID_LABEL, "Time Zone");
-        CHARACTERISTICS.put("00002a07" + UUID_LABEL, "Tx Power Level");
-        CHARACTERISTICS.put("00002a45" + UUID_LABEL, "Unread Alert Status");
+        CHARACTERISTICS.put("00002A49" + UUID_LABEL, "Blood Pressure Feature");
+        CHARACTERISTICS.put("00002A35" + UUID_LABEL, "Blood Pressure Measurement");
+        CHARACTERISTICS.put("00002A38" + UUID_LABEL, "Body Sensor Location");
+        CHARACTERISTICS.put("00002A22" + UUID_LABEL, "Boot Keyboard Input Report");
+        CHARACTERISTICS.put("00002A32" + UUID_LABEL, "Boot Keyboard Output Report");
+        CHARACTERISTICS.put("00002A33" + UUID_LABEL, "Boot Mouse Input Report");
+        CHARACTERISTICS.put("00002A5C" + UUID_LABEL, "CSC Feature");
+        CHARACTERISTICS.put("00002A5B" + UUID_LABEL, "CSC Measurement");
+        CHARACTERISTICS.put("00002A2B" + UUID_LABEL, "Current Time");
+        CHARACTERISTICS.put("00002A66" + UUID_LABEL, "Cycling Power Control Point");
+        CHARACTERISTICS.put("00002A65" + UUID_LABEL, "Cycling Power Feature");
+        CHARACTERISTICS.put("00002A63" + UUID_LABEL, "Cycling Power Measurement");
+        CHARACTERISTICS.put("00002A64" + UUID_LABEL, "Cycling Power Vector");
+        CHARACTERISTICS.put("00002A08" + UUID_LABEL, "Date Time");
+        CHARACTERISTICS.put("00002A0A" + UUID_LABEL, "Day Date Time");
+        CHARACTERISTICS.put("00002A09" + UUID_LABEL, "Day of Week");
+        CHARACTERISTICS.put("00002A00" + UUID_LABEL, "Device Name");
+        CHARACTERISTICS.put("00002A0D" + UUID_LABEL, "DST Offset");
+        CHARACTERISTICS.put("00002A0C" + UUID_LABEL, "Exact Time 256");
+        CHARACTERISTICS.put("00002A26" + UUID_LABEL, "Firmware Revision String");
+        CHARACTERISTICS.put("00002A51" + UUID_LABEL, "Glucose Feature");
+        CHARACTERISTICS.put("00002A18" + UUID_LABEL, "Glucose Measurement");
+        CHARACTERISTICS.put("00002A34" + UUID_LABEL, "Glucose Measurement Context");
+        CHARACTERISTICS.put("00002A27" + UUID_LABEL, "Hardware Revision String");
+        CHARACTERISTICS.put("00002A39" + UUID_LABEL, "Heart Rate Control Point");
+        CHARACTERISTICS.put("00002A37" + UUID_LABEL, "Heart Rate Measurement");
+        CHARACTERISTICS.put("00002A4C" + UUID_LABEL, "HID Control Point");
+        CHARACTERISTICS.put("00002A4A" + UUID_LABEL, "HID Information");
+        CHARACTERISTICS.put("00002A2A" + UUID_LABEL, "IEEE 11073-20601 Regulatory Certification Data List");
+        CHARACTERISTICS.put("00002A36" + UUID_LABEL, "Intermediate Cuff Pressure");
+        CHARACTERISTICS.put("00002A1E" + UUID_LABEL, "Intermediate Temperature");
+        CHARACTERISTICS.put("00002A6B" + UUID_LABEL, "LN Control Point");
+        CHARACTERISTICS.put("00002A6A" + UUID_LABEL, "LN Feature");
+        CHARACTERISTICS.put("00002A0F" + UUID_LABEL, "Local Time Information");
+        CHARACTERISTICS.put("00002A67" + UUID_LABEL, "Location and Speed");
+        CHARACTERISTICS.put("00002A29" + UUID_LABEL, "Manufacturer Name String");
+        CHARACTERISTICS.put("00002A21" + UUID_LABEL, "Measurement Interval");
+        CHARACTERISTICS.put("00002A24" + UUID_LABEL, "Model Number String");
+        CHARACTERISTICS.put("00002A68" + UUID_LABEL, "Navigation");
+        CHARACTERISTICS.put("00002A46" + UUID_LABEL, "New Alert");
+        CHARACTERISTICS.put("00002A04" + UUID_LABEL, "Peripheral Preferred Connection Parameters");
+        CHARACTERISTICS.put("00002A02" + UUID_LABEL, "Peripheral Privacy Flag");
+        CHARACTERISTICS.put("00002A50" + UUID_LABEL, "PnP ID");
+        CHARACTERISTICS.put("00002A69" + UUID_LABEL, "Position Quality");
+        CHARACTERISTICS.put("00002A4E" + UUID_LABEL, "Protocol Mode");
+        CHARACTERISTICS.put("00002A03" + UUID_LABEL, "Reconnection Address");
+        CHARACTERISTICS.put("00002A52" + UUID_LABEL, "Record Access Control Point");
+        CHARACTERISTICS.put("00002A14" + UUID_LABEL, "Reference Time Information");
+        CHARACTERISTICS.put("00002A4D" + UUID_LABEL, "Report");
+        CHARACTERISTICS.put("00002A4B" + UUID_LABEL, "Report Map");
+        CHARACTERISTICS.put("00002A40" + UUID_LABEL, "Ringer Control Point");
+        CHARACTERISTICS.put("00002A41" + UUID_LABEL, "Ringer Setting");
+        CHARACTERISTICS.put("00002A54" + UUID_LABEL, "RSC Feature");
+        CHARACTERISTICS.put("00002A53" + UUID_LABEL, "RSC Measurement");
+        CHARACTERISTICS.put("00002A55" + UUID_LABEL, "SC Control Point");
+        CHARACTERISTICS.put("00002A4F" + UUID_LABEL, "Scan Interval Window");
+        CHARACTERISTICS.put("00002A31" + UUID_LABEL, "Scan Refresh");
+        CHARACTERISTICS.put("00002A5D" + UUID_LABEL, "Sensor Location");
+        CHARACTERISTICS.put("00002A25" + UUID_LABEL, "Serial Number String");
+        CHARACTERISTICS.put("00002A05" + UUID_LABEL, "Service Changed");
+        CHARACTERISTICS.put("00002A28" + UUID_LABEL, "Software Revision String");
+        CHARACTERISTICS.put("00002A47" + UUID_LABEL, "Supported New Alert Category");
+        CHARACTERISTICS.put("00002A48" + UUID_LABEL, "Supported Unread Alert Category");
+        CHARACTERISTICS.put("00002A23" + UUID_LABEL, "System ID");
+        CHARACTERISTICS.put("00002A1C" + UUID_LABEL, "Temperature Measurement");
+        CHARACTERISTICS.put("00002A1D" + UUID_LABEL, "Temperature Type");
+        CHARACTERISTICS.put("00002A12" + UUID_LABEL, "Time Accuracy");
+        CHARACTERISTICS.put("00002A13" + UUID_LABEL, "Time Source");
+        CHARACTERISTICS.put("00002A16" + UUID_LABEL, "Time Update Control Point");
+        CHARACTERISTICS.put("00002A17" + UUID_LABEL, "Time Update State");
+        CHARACTERISTICS.put("00002A11" + UUID_LABEL, "Time with DST");
+        CHARACTERISTICS.put("00002A0E" + UUID_LABEL, "Time Zone");
+        CHARACTERISTICS.put("00002A07" + UUID_LABEL, "Tx Power Level");
+        CHARACTERISTICS.put("00002A45" + UUID_LABEL, "Unread Alert Status");
 
         VALUE_FORMATS.put(52, "32bit float");
         VALUE_FORMATS.put(50, "16bit float");
