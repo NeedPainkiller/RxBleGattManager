@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.legacy.exceptions;
+package com.rainbow.kam.ble_gatt_manager.exceptions;
 
 /**
  * Created by Kang Young Won on 2016-05-12.

@@ -17,13 +17,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.primitives.Bytes;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.ConnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.DisconnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.GattResourceNotDiscoveredException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.NotificationCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.ReadCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.RssiMissException;
-import com.rainbow.kam.ble_gatt_manager.legacy.exceptions.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.GattAttributes;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.DisconnectedFailException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.GattResourceNotDiscoveredException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.NotificationCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.ReadCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.RssiMissException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
 
 import java.util.List;
 import java.util.UUID;
