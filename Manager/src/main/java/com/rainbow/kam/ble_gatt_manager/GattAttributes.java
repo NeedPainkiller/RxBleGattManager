@@ -22,14 +22,32 @@ import android.util.SparseArray;
 
 import com.google.common.collect.Maps;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_FLOAT;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SFLOAT;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT16;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT32;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT8;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT16;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT32;
+import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_BROADCAST;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_READ;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
+import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
+
 public class GattAttributes {
 
-    private final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB";
+    private final static String UNKNOWN = BuildConfig.UNKNOWN;
+
+    public final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB";
 
     public final static String CLIENT_CHARACTERISTIC_CONFIG = ("00002902" + UUID_LABEL);
 
@@ -42,36 +60,21 @@ public class GattAttributes {
 
     private final static Map<String, String> SERVICES = Maps.newHashMap();
     private final static Map<String, String> CHARACTERISTICS = Maps.newHashMap();
+
     private final static SparseArray<String> VALUE_FORMATS = new SparseArray<>();
 
-    public final static String UNKNOWN = "UNKNOWN";
-
-    private final static List<Integer> FORMAT_LIST;
-    private final static SparseArray<String> BOND_LIST = new SparseArray<>();
-    private final static SparseArray<String> TYPE_LIST = new SparseArray<>();
+    private final static LinkedHashMap<Integer, String> PROPERTIES = Maps.newLinkedHashMap();
 
 
     public static String resolveServiceName(final String uuid) {
         String res = SERVICES.get(uuid.toUpperCase(Locale.getDefault()));
-        if (res != null) {
-            return res;
-        }
-        return UNKNOWN;
+        return res == null ? UNKNOWN : res;
     }
 
 
     public static String resolveCharacteristicName(final String uuid) {
         String res = CHARACTERISTICS.get(uuid.toUpperCase(Locale.getDefault()));
-        if (res != null) {
-            return res;
-        }
-        return UNKNOWN;
-    }
-
-
-    public static String resolveValueTypeDescription(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-        Integer format = getValueFormat(bluetoothGattCharacteristic);
-        return VALUE_FORMATS.get(format, UNKNOWN);
+        return res == null ? UNKNOWN : res;
     }
 
 
@@ -80,25 +83,44 @@ public class GattAttributes {
     }
 
 
-    private static int getValueFormat(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+    public static String resolveValueTypeDescription(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         int properties = bluetoothGattCharacteristic.getProperties();
-        int format;
-        int formatListLength = FORMAT_LIST.size();
+        int formatListLength = VALUE_FORMATS.size();
         for (int i = 0; i < formatListLength; i++) {
-            format = FORMAT_LIST.get(i);
-            if ((format & properties) != 0) return format;
+            int format = VALUE_FORMATS.keyAt(i);
+            if ((format & properties) != 0)
+                return VALUE_FORMATS.get(format, UNKNOWN);
         }
-        return 0;
+        return UNKNOWN;
     }
 
 
-    public static String getBond(int bond) {
-        return BOND_LIST.get(bond, UNKNOWN);
+    public static LinkedHashMap<Integer, String> getProperties() {
+        return PROPERTIES;
     }
 
 
-    public static String getType(int type) {
-        return TYPE_LIST.get(type, UNKNOWN);
+    public static String getAvailableProperties(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+        StringBuilder propertiesString = new StringBuilder();
+        int properties = bluetoothGattCharacteristic.getProperties();
+
+        propertiesString.append(String.format("0x%04X", properties));
+        for (int props : PROPERTIES.keySet()) {
+            if (isPropsAvailable(properties, props)) {
+                propertiesString.append(PROPERTIES.get(props));
+            }
+        }
+        return propertiesString.toString();
+    }
+
+
+    public static boolean isPropsAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int prop) {
+        return (bluetoothGattCharacteristic.getProperties() & prop) != 0;
+    }
+
+
+    public static boolean isPropsAvailable(int properties, int prop) {
+        return (properties & prop) != 0;
     }
 
 
@@ -208,33 +230,22 @@ public class GattAttributes {
         CHARACTERISTICS.put("00002A07" + UUID_LABEL, "Tx Power Level");
         CHARACTERISTICS.put("00002A45" + UUID_LABEL, "Unread Alert Status");
 
-        VALUE_FORMATS.put(52, "32bit float");
-        VALUE_FORMATS.put(50, "16bit float");
-        VALUE_FORMATS.put(34, "16bit signed int");
-        VALUE_FORMATS.put(36, "32bit signed int");
-        VALUE_FORMATS.put(33, "8bit signed int");
-        VALUE_FORMATS.put(18, "16bit unsigned int");
-        VALUE_FORMATS.put(20, "32bit unsigned int");
-        VALUE_FORMATS.put(17, "8bit unsigned int");
+        VALUE_FORMATS.put(FORMAT_FLOAT, "32bit float");
+        VALUE_FORMATS.put(FORMAT_SFLOAT, "16bit float");
+        VALUE_FORMATS.put(FORMAT_SINT16, "16bit signed int");
+        VALUE_FORMATS.put(FORMAT_SINT32, "32bit signed int");
+        VALUE_FORMATS.put(FORMAT_SINT8, "8bit signed int");
+        VALUE_FORMATS.put(FORMAT_UINT16, "16bit unsigned int");
+        VALUE_FORMATS.put(FORMAT_UINT32, "32bit unsigned int");
+        VALUE_FORMATS.put(FORMAT_UINT8, "8bit unsigned int");
 
-        FORMAT_LIST = Arrays.asList(
-                BluetoothGattCharacteristic.FORMAT_FLOAT,
-                BluetoothGattCharacteristic.FORMAT_SFLOAT,
-                BluetoothGattCharacteristic.FORMAT_SINT16,
-                BluetoothGattCharacteristic.FORMAT_SINT32,
-                BluetoothGattCharacteristic.FORMAT_SINT8,
-                BluetoothGattCharacteristic.FORMAT_UINT16,
-                BluetoothGattCharacteristic.FORMAT_UINT32,
-                BluetoothGattCharacteristic.FORMAT_UINT8
-        );
-
-        BOND_LIST.put(10, "NOT BONDED");
-        BOND_LIST.put(11, "BONDING");
-        BOND_LIST.put(12, "BONDED");
-
-        TYPE_LIST.put(0, UNKNOWN);
-        TYPE_LIST.put(1, "CLASSIC");
-        TYPE_LIST.put(2, "BLE");
-        TYPE_LIST.put(3, "DUAL");
+        PROPERTIES.put(PROPERTY_BROADCAST, "BROADCAST \b");
+        PROPERTIES.put(PROPERTY_READ, "READ \b");
+        PROPERTIES.put(PROPERTY_WRITE_NO_RESPONSE, "WRITE NO RESPONSE \b");
+        PROPERTIES.put(PROPERTY_WRITE, "WRITE \b");
+        PROPERTIES.put(PROPERTY_NOTIFY, "NOTIFY \b");
+        PROPERTIES.put(PROPERTY_INDICATE, "INDICATE \b");
+        PROPERTIES.put(PROPERTY_SIGNED_WRITE, "SIGNED WRITE \b");
+        PROPERTIES.put(PROPERTY_EXTENDED_PROPS, "EXTENDED PROPS \b");
     }
 }

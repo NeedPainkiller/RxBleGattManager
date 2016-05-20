@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager;
+package com.rainbow.kam.ble_gatt_manager.util;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -12,6 +12,8 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
+
+import com.rainbow.kam.ble_gatt_manager.R;
 
 import java.lang.ref.WeakReference;
 
