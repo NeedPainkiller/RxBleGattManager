@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.rainbow.kam.ble_gatt_manager;
+package com.rainbow.kam.ble_gatt_manager.attributes;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.util.SparseArray;
 
 import com.google.common.collect.Maps;
+import com.rainbow.kam.ble_gatt_manager.BuildConfig;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
