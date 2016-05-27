@@ -1,6 +1,6 @@
 package com.rainbow.kam.ble_gatt_manager.scanner;
 
-import android.app.Activity;
+import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -19,20 +19,20 @@ import rx.Subscriber;
 public class RxBLE2 {
 
     private final BluetoothAdapter bluetoothAdapter;
-    private final BluetoothLeScanner scanner;
+    private BluetoothLeScanner scanner;
 
-    private Subscriber<? super BleDevice> subscriber;
+    private Subscriber<? super BleDevice> scanSubscriber;
     private final ScanCallback callback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            subscriber.onNext(BleDevice.create(result));
+            scanSubscriber.onNext(BleDevice.create(result));
         }
     };
 
 
-    public RxBLE2(Activity activity) {
-        BluetoothManager manager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
+    public RxBLE2(final Application application) {
+        BluetoothManager manager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
         scanner = bluetoothAdapter.getBluetoothLeScanner();
     }
@@ -46,11 +46,14 @@ public class RxBLE2 {
         return Observable.create(new Observable.OnSubscribe<BleDevice>() {
             @Override
             public void call(Subscriber<? super BleDevice> subscriber) {
-                RxBLE2.this.subscriber = subscriber;
+                scanSubscriber = subscriber;
+                if (scanner == null) {
+                    scanner = bluetoothAdapter.getBluetoothLeScanner();
+                }
                 scanner.startScan(callback);
             }
-        }).distinctUntilChanged().doOnSubscribe(() -> {
-            if (bluetoothAdapter.isEnabled()) {
+        }).onBackpressureBuffer().distinctUntilChanged().doOnSubscribe(() -> {
+            if (scanner != null && bluetoothAdapter.isEnabled()) {
                 scanner.stopScan(callback);
             }
         });

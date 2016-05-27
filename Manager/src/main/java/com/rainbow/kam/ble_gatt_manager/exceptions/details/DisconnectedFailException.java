@@ -15,6 +15,12 @@ public class DisconnectedFailException extends GattException {
     }
 
 
+    public DisconnectedFailException(String subMessage) {
+        super(subMessage);
+        this.macAddress = "?";
+    }
+
+
     @Override public String toString() {
         return "DisconnectedFailException{ " +
                 "macAddress -> '" + macAddress + '\'' +
