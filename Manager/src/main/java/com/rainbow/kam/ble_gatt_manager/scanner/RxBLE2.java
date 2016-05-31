@@ -52,11 +52,14 @@ public class RxBLE2 {
                 }
                 scanner.startScan(callback);
             }
-        }).onBackpressureBuffer().distinctUntilChanged().doOnSubscribe(() -> {
-            if (scanner != null && bluetoothAdapter.isEnabled()) {
-                scanner.stopScan(callback);
-            }
-        });
+        })
+                .onBackpressureBuffer()
+//                .distinctUntilChanged()
+                .doOnSubscribe(() -> {
+                    if (scanner != null && bluetoothAdapter.isEnabled()) {
+                        scanner.stopScan(callback);
+                    }
+                });
     }
 }
 

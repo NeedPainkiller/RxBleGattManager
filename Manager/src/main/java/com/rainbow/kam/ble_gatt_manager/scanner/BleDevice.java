@@ -29,6 +29,9 @@ public class BleDevice implements Comparable<BleDevice> {
     public static BleDevice create(BluetoothDevice device, int rssi) {
         return new BleDevice(device, rssi);
     }
+    public static BleDevice create(BluetoothDevice device ) {
+        return new BleDevice(device, 0);
+    }
 
 
     public static BleDevice create(ScanResult result) {
