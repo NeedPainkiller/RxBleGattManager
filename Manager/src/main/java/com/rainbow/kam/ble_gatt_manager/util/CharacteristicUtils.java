@@ -2,6 +2,10 @@ package com.rainbow.kam.ble_gatt_manager.util;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 
+import com.google.common.collect.Maps;
+
+import java.util.HashMap;
+
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -12,16 +16,32 @@ import rx.android.schedulers.AndroidSchedulers;
 public class CharacteristicUtils {
 
 
-    public static Observable<String> getStringValue(BluetoothGattCharacteristic characteristic, String format) {
+    public static Observable<HashMap<String, String>> getFormattedValues(BluetoothGattCharacteristic characteristic) {
 
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override public void call(Subscriber<? super String> subscriber) {
-                final byte[] value = characteristic.getValue();
-                final StringBuilder valueBuilder = new StringBuilder(value.length);
+        final String hex = "%02X";
+        final String str = "%c";
+
+        final byte[] value = characteristic.getValue();
+        final HashMap<String, String> valueMap = Maps.newHashMap();
+        final StringBuilder hexBuilder = new StringBuilder(value.length).append("0x");
+        final StringBuilder decBuilder = new StringBuilder(value.length);
+        final StringBuilder strBuilder = new StringBuilder(value.length);
+
+        return Observable.create(new Observable.OnSubscribe<HashMap<String, String>>() {
+            @Override
+            public void call(Subscriber<? super HashMap<String, String>> subscriber) {
+
                 for (byte byteChar : value) {
-                    valueBuilder.append(String.format(format, byteChar));
+                    hexBuilder.append(String.format(hex, byteChar));
+                    decBuilder.append(byteChar & 0xff);
+                    strBuilder.append(String.format(str, byteChar));
                 }
-                subscriber.onNext(valueBuilder.toString());
+                valueMap.put("HEX", hexBuilder.toString());
+                valueMap.put("DEC", decBuilder.toString());
+                valueMap.put("STR", strBuilder.toString());
+
+                subscriber.onNext(valueMap);
+                subscriber.unsubscribe();
             }
         }).subscribeOn(AndroidSchedulers.mainThread());
     }
