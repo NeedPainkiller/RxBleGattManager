@@ -1,22 +1,21 @@
-package com.rainbow.kam.ble_gatt_manager.util;
+package com.rainbow.kam.ble_gatt_manager.helper;
 
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import com.rainbow.kam.ble_gatt_manager.R;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action0;
+import java.lang.ref.WeakReference;
 
 
 /**
@@ -34,58 +33,7 @@ public class BluetoothHelper {
     private static final String PERMISSION_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
 
 
-    @TargetApi(Build.VERSION_CODES.M)
-    public Action0 requestBluetoothPermission(Activity activity) {
-        return () -> {
-            if (ContextCompat.checkSelfPermission(activity, PERMISSION_COARSE) != PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(activity, PERMISSION_FINE) != PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, new String[]{PERMISSION_COARSE, PERMISSION_FINE}, REQUEST_ENABLE_BLE);
-            }
-        };
-    }
-
-
-    public Action0 requestBluetoothEnable(Activity activity) {
-        return () -> {
-            BluetoothAdapter adapter = ((BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
-            if (adapter != null && !adapter.isEnabled()) {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                ActivityCompat.startActivityForResult(activity, intent, REQUEST_ENABLE_BLE, null);
-            }
-        };
-    }
-
-
-    public Observable<Integer> onRequestPermissionsResult(int requestCode, int[] grantResults) {
-        return Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override public void call(Subscriber<? super Integer> subscriber) {
-                if (requestCode == BluetoothHelper.REQUEST_ENABLE_BLE && grantResults.length != 0) {
-                    if (grantResults[0] == PERMISSION_GRANTED || grantResults[1] == PERMISSION_GRANTED) {
-                        subscriber.onNext(R.string.permission_thanks);
-                    } else {
-                        subscriber.onNext(R.string.permission_request);
-                        subscriber.onCompleted();
-                    }
-                } else {
-                    subscriber.onNext(R.string.permission_denial);
-                }
-            }
-        });
-    }
-
-
-    public Observable<Integer> onRequestEnableResult(int requestCode, int resultCode) {
-        return Observable.create((Observable.OnSubscribe<Integer>) subscriber -> {
-            if (requestCode == REQUEST_ENABLE_BLE && resultCode == RESULT_OK) {
-                subscriber.onNext(R.string.bluetooth_on);
-            } else {
-                subscriber.onNext(R.string.bluetooth_not_init);
-                subscriber.onCompleted();
-            }
-        });
-    }
-
-   /* private static WeakReference<Activity> reference;
+    private static WeakReference<Activity> reference;
 
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -143,6 +91,6 @@ public class BluetoothHelper {
             reference.get().finish();
         }
         reference.clear();
-    }*/
+    }
 
 }
