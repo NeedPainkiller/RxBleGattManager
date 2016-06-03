@@ -19,6 +19,8 @@ android {
         versionName "1.0"
 
         buildConfigField('String', 'UNKNOWN', '"UNKNOWN"');
+        buildConfigField('String', 'UUID_HEX', '"0x"');
+        buildConfigField('String', 'UUID_REGEX', '"[0-9a-fA-Z]{4}-[0-9a-fA-Z]{4}-[0-9a-fA-Z]{4}-[0-9a-fA-Z]{12}"');
     }
     buildTypes {
         release {
@@ -43,13 +45,13 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
 
     // rxjava
-    compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'io.reactivex:rxjava:1.1.3'
+    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'io.reactivex:rxjava:1.1.5'
 
 
     // Dagger
-    compile 'com.google.dagger:dagger:2.0.2'
-    apt 'com.google.dagger:dagger-compiler:2.0.2'
+    compile 'com.google.dagger:dagger:2.2'
+    apt 'com.google.dagger:dagger-compiler:2.2'
 
     //  jsr310
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
