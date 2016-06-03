@@ -8,7 +8,8 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothHelper;
+import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
+import com.rainbow.kam.ble_gatt_manager.helper.BluetoothHelper;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +19,12 @@ import rx.Observable;
 /**
  * Created by Kang Young Won on 2016-05-23.
  */
-public class RxBLE {
+public class RxBle {
 
     private BluetoothAdapter bluetoothAdapter;
 
 
-    public RxBLE(Activity activity) {
+    public RxBle(Activity activity) {
         String bluetoothService = Context.BLUETOOTH_SERVICE;
         BluetoothManager manager = (BluetoothManager) activity.getSystemService(bluetoothService);
         bluetoothAdapter = manager.getAdapter();

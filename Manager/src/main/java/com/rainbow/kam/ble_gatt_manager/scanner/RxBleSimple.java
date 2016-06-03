@@ -8,7 +8,8 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothHelper;
+import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
+import com.rainbow.kam.ble_gatt_manager.helper.BluetoothHelper;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -16,12 +17,13 @@ import rx.Subscriber;
 /**
  * Created by Kang Young Won on 2016-05-24.
  */
-public class RxBLE2 {
+public class RxBleSimple {
 
     private final BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner scanner;
 
     private Subscriber<? super BleDevice> scanSubscriber;
+
     private final ScanCallback callback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
@@ -31,7 +33,7 @@ public class RxBLE2 {
     };
 
 
-    public RxBLE2(final Application application) {
+    public RxBleSimple(final Application application) {
         BluetoothManager manager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
         scanner = bluetoothAdapter.getBluetoothLeScanner();
@@ -43,23 +45,17 @@ public class RxBLE2 {
             return Observable.empty();
         }
 
-        return Observable.create(new Observable.OnSubscribe<BleDevice>() {
-            @Override
-            public void call(Subscriber<? super BleDevice> subscriber) {
-                scanSubscriber = subscriber;
-                if (scanner == null) {
-                    scanner = bluetoothAdapter.getBluetoothLeScanner();
-                }
-                scanner.startScan(callback);
+        return Observable.create((Observable.OnSubscribe<BleDevice>) subscriber -> {
+            scanSubscriber = subscriber;
+            if (scanner == null) {
+                scanner = bluetoothAdapter.getBluetoothLeScanner();
             }
-        })
-                .onBackpressureBuffer()
-//                .distinctUntilChanged()
-                .doOnSubscribe(() -> {
-                    if (scanner != null && bluetoothAdapter.isEnabled()) {
-                        scanner.stopScan(callback);
-                    }
-                });
+            scanner.startScan(callback);
+        }).onBackpressureBuffer().doOnSubscribe(() -> {
+            if (scanner != null && bluetoothAdapter.isEnabled()) {
+                scanner.stopScan(callback);
+            }
+        });
     }
 }
 
