@@ -1,7 +1,6 @@
 
-package com.rainbow.kam.ble_gatt_manager.ble;
+package com.rainbow.kam.ble_gatt_manager.manager;
 
-import android.app.Activity;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,7 +16,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.primitives.Bytes;
-import com.rainbow.kam.ble_gatt_manager.attributes.GattAttributes;
+import com.rainbow.kam.ble_gatt_manager.data.attributes.GattAttributes;
+import com.rainbow.kam.ble_gatt_manager.exceptions.GattException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.DisconnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.GattResourceNotDiscoveredException;
@@ -25,6 +25,7 @@ import com.rainbow.kam.ble_gatt_manager.exceptions.details.NotificationCharacter
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ReadCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.RssiMissException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,9 +38,9 @@ import rx.Subscription;
  * Created by kam6512 on 2015-10-29.
  */
 
-public class GattManager {
+public class GattManagerOriginalSingleton {
 
-    private final static String TAG = GattManager.class.getSimpleName();
+    private final static String TAG = GattManagerOriginalSingleton.class.getSimpleName();
 
     private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
 
@@ -47,9 +48,9 @@ public class GattManager {
     private final static UUID BATTERY_SERVICE_UUID = UUID.fromString(GattAttributes.BATTERY_SERVICE_UUID);
     private final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(GattAttributes.BATTERY_CHARACTERISTIC_UUID);
 
-    private final Application application;
+    private Application application;
 
-    private final GattCustomCallbacks gattCustomCallbacks;
+    private GattCustomCallbacks gattCustomCallbacks;
 
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
@@ -62,19 +63,58 @@ public class GattManager {
     private BluetoothGattCharacteristic writeCharacteristic;
     private BluetoothGattCharacteristic notificationCharacteristic;
 
+    private BleDevice bleDevice;
 
-    public GattManager(Activity activity, GattCustomCallbacks gattCustomCallbacks) {
-        this(activity.getApplication(), gattCustomCallbacks);
+
+    private GattManagerOriginalSingleton() {
     }
 
 
-    public GattManager(Application application, GattCustomCallbacks gattCustomCallbacks) {
+    private static class GattManagerHolder {
+        private static final GattManagerOriginalSingleton instance = new GattManagerOriginalSingleton();
+    }
+
+
+    public static GattManagerOriginalSingleton getInstance() {
+        return GattManagerHolder.instance;
+    }
+
+
+    public void establishConnection(final Application application, final GattCustomCallbacks gattCustomCallbacks, final BleDevice bleDevice) {
+
         this.application = application;
-        this.gattCustomCallbacks = gattCustomCallbacks;
 
         if (bluetoothManager == null || bluetoothAdapter == null) {
             bluetoothManager = (BluetoothManager) this.application.getSystemService(Context.BLUETOOTH_SERVICE);
             bluetoothAdapter = bluetoothManager.getAdapter();
+        }
+
+
+        this.bleDevice = bleDevice;
+        this.gattCustomCallbacks = gattCustomCallbacks;
+
+
+        if (!bluetoothAdapter.isEnabled()) {
+            gattCustomCallbacks.onError(new GattException("Adapter is disabled"));
+        }
+
+        String deviceAddress = bleDevice.getAddress();
+        if (TextUtils.isEmpty(deviceAddress)) {
+            gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "Address is not available"));
+            return;
+        }
+
+        bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
+        if (bluetoothDevice == null) {
+
+            gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "RemoteDevice is not available"));
+        } else {
+
+            if (isConnected()) {
+                closeGatt();
+            }
+
+            bluetoothGatt = bluetoothDevice.connectGatt(application, false, bluetoothGattCallback);
         }
     }
 
@@ -84,48 +124,49 @@ public class GattManager {
     }
 
 
-    public void connect(final String deviceAddress) {
-        if (TextUtils.isEmpty(deviceAddress)) {
-            gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "Address is not available"));
-            return;
-        }
-        if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equals(deviceAddress)) {
-            bluetoothGatt.connect();
-        } else {
-            bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
-            if (bluetoothDevice == null) {
-                gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "RemoteDevice is not available"));
-            } else {
-                bluetoothGatt = bluetoothDevice.connectGatt(application, false, bluetoothGattCallback);
-            }
-        }
+    public BleDevice getBleDevice() {
+        return bleDevice;
+    }
+
+
+    public void substituteCallback(final GattCustomCallbacks callbacks) {
+        gattCustomCallbacks = callbacks;
+    }
+
+
+    public void disconnectImmediately() {
+        disconnect();
+        closeGatt();
     }
 
 
     public void disconnect() {
-        String deviceAddress = bluetoothGatt.getDevice().getAddress();
+        String deviceAddress;
         if (bluetoothGatt != null) {
-            if (isConnected() || isBluetoothAvailable()) {
+            deviceAddress = bluetoothGatt.getDevice().getAddress();
+            if (isConnected() || bluetoothAdapter.isEnabled()) {
                 bluetoothGatt.disconnect();
             } else {
                 gattCustomCallbacks.onError(new DisconnectedFailException(deviceAddress, "Device already Disconnected"));
             }
-        } else {
-            gattCustomCallbacks.onError(new DisconnectedFailException(deviceAddress, "BluetoothGatt is not Available"));
         }
+//        else {
+//            gattCustomCallbacks.onError(new DisconnectedFailException("BluetoothGatt is not Available"));
+//        }
     }
 
 
-    public boolean isBluetoothAvailable() {
-        return bluetoothAdapter.isEnabled();
+    public void closeGatt() {
+        if (bluetoothGatt != null) {
+            bluetoothGatt.close();
+        }
     }
 
 
     public boolean isConnected() {
         List<BluetoothDevice> bluetoothDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
         for (BluetoothDevice bluetoothDeviceItem : bluetoothDevices) {
-            if (bluetoothDevice != null &&
-                    bluetoothDevice.getAddress().equals(bluetoothDeviceItem.getAddress())) {
+            if (bluetoothDevice != null && bluetoothDevice.getAddress().equals(bluetoothDeviceItem.getAddress())) {
                 return true;
             }
         }
@@ -146,14 +187,28 @@ public class GattManager {
     }
 
 
-    private void startServiceDiscovery() {
+    public void startServiceDiscovery() {
         bluetoothGatt.discoverServices();
     }
 
 
     public void setNotification(BluetoothGattCharacteristic notificationCharacteristic, boolean enabled) {
 
-        Observable.just(notificationCharacteristic)
+        Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
+            subscriber.onNext(bluetoothGatt.setCharacteristicNotification(notificationCharacteristic, enabled));
+            subscriber.onCompleted();
+        }).subscribe(aBoolean -> gattCustomCallbacks.onSetNotificationSuccess(),
+                throwable -> gattCustomCallbacks.onError(new NotificationCharacteristicException(notificationDescriptor.getCharacteristic(), notificationDescriptor, throwable.getMessage())),
+                () -> {
+                    notificationDescriptor = notificationCharacteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID);
+                    byte[] value = enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
+                    notificationDescriptor.setValue(value);
+                    bluetoothGatt.writeDescriptor(notificationDescriptor);
+                })
+                .unsubscribe();
+
+
+        /*Observable.just(notificationCharacteristic)
                 .map(characteristic -> {
                     bluetoothGatt.setCharacteristicNotification(notificationCharacteristic, enabled);
                     notificationDescriptor = characteristic.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG_UUID);
@@ -167,7 +222,15 @@ public class GattManager {
                 }, throwable -> {
                     gattCustomCallbacks.onError(new NotificationCharacteristicException(notificationDescriptor.getCharacteristic(), notificationDescriptor, throwable.getMessage()));
                 })
-                .unsubscribe();
+                .unsubscribe();*/
+    }
+
+
+    public void setNotification(UUID notificationUUID, boolean enabled) {
+        if (notificationCharacteristic == null || !notificationCharacteristic.getUuid().equals(notificationUUID)) {
+            notificationCharacteristic = findCharacteristic(notificationUUID);
+        }
+        setNotification(notificationCharacteristic, enabled);
     }
 
 
@@ -189,6 +252,19 @@ public class GattManager {
 
     public void writeValue(final BluetoothGattCharacteristic bluetoothGattCharacteristic, final List<Byte> dataToWrite) {
         this.writeValue(bluetoothGattCharacteristic, Bytes.toArray(dataToWrite));
+    }
+
+
+    public void writeValue(final UUID writeUUID, final byte[] dataToWrite) {
+        if (writeCharacteristic == null || !writeCharacteristic.getUuid().equals(writeUUID)) {
+            writeCharacteristic = findCharacteristic(writeUUID);
+        }
+        writeValue(writeCharacteristic, dataToWrite);
+    }
+
+
+    public void writeValue(final UUID writeUUID, final List<Byte> dataToWrite) {
+        this.writeValue(writeUUID, Bytes.toArray(dataToWrite));
     }
 
 
@@ -219,28 +295,12 @@ public class GattManager {
     }
 
 
-    public void setNotification(UUID notificationUUID, boolean enabled) {
-        if (notificationCharacteristic == null || !notificationCharacteristic.getUuid().equals(notificationUUID)) {
-            notificationCharacteristic = getCharacteristic(notificationUUID);
-        }
-        setNotification(notificationCharacteristic, enabled);
-    }
-
-
     public void readBatteryValue() {
         readValue(bluetoothGatt.getService(BATTERY_SERVICE_UUID).getCharacteristic(BATTERY_CHARACTERISTIC_UUID));
     }
 
 
-    public void writeValue(final UUID writeUUID, final byte[] dataToWrite) {
-        if (writeCharacteristic == null || !writeCharacteristic.getUuid().equals(writeUUID)) {
-            writeCharacteristic = getCharacteristic(writeUUID);
-        }
-        writeValue(writeCharacteristic, dataToWrite);
-    }
-
-
-    private BluetoothGattCharacteristic getCharacteristic(UUID uuid) {
+    private BluetoothGattCharacteristic findCharacteristic(UUID uuid) {
 
         List<BluetoothGattService> serviceList = bluetoothGatt.getServices();
         List<BluetoothGattCharacteristic> characteristicList;
@@ -253,11 +313,14 @@ public class GattManager {
                 }
             }
         }
+        gattCustomCallbacks.onError(new GattResourceNotDiscoveredException("UUID NOT MATCH!"));
         return null;
     }
 
 
     private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
+
+
         @Override
         public void onConnectionStateChange(BluetoothGatt bluetoothGatt, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
@@ -269,7 +332,7 @@ public class GattManager {
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
 
                 gattCustomCallbacks.onDeviceDisconnected();
-                bluetoothGatt.close();
+                closeGatt();
             }
             readRssiValue();
         }
@@ -343,5 +406,6 @@ public class GattManager {
                 gattCustomCallbacks.onError(new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status));
             }
         }
+
     };
 }
