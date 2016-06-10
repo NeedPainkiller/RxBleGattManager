@@ -26,6 +26,7 @@ import com.rainbow.kam.ble_gatt_manager.BuildConfig;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_FLOAT;
 import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SFLOAT;
@@ -50,10 +51,10 @@ public class BluetoothGatts {
 
     public final static String UUID_LABEL = "-0000-1000-8000-00805F9B34FB";
 
-    public final static String CLIENT_CHARACTERISTIC_CONFIG = ("00002902" + UUID_LABEL);
+    public final static UUID CLIENT_CHARACTERISTIC_CONFIG = UUID.fromString("00002902" + UUID_LABEL);
 
-    public final static String BATTERY_SERVICE_UUID = ("0000180F" + UUID_LABEL);
-    public final static String BATTERY_CHARACTERISTIC_UUID = ("00002A19" + UUID_LABEL);
+    public final static UUID BATTERY_SERVICE_UUID = UUID.fromString("0000180F" + UUID_LABEL);
+    public final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString("00002A19" + UUID_LABEL);
 
     public final static String SERVICE_TYPE_PRIMARY = "PRIMARY";
     public final static String SERVICE_TYPE_SECONDARY = "SECONDARY";
@@ -125,7 +126,7 @@ public class BluetoothGatts {
 
     static {
         SERVICES.put("00001811" + UUID_LABEL, "Alert Notification Service");
-        SERVICES.put(BATTERY_SERVICE_UUID, "Battery Service");
+        SERVICES.put(BATTERY_SERVICE_UUID.toString(), "Battery Service");
         SERVICES.put("00001810" + UUID_LABEL, "Blood Pressure");
         SERVICES.put("00001805" + UUID_LABEL, "Current Time Service");
         SERVICES.put("00001818" + UUID_LABEL, "Cycling Power");
@@ -153,7 +154,7 @@ public class BluetoothGatts {
         CHARACTERISTICS.put("00002A44" + UUID_LABEL, "Alert Notification Control Point");
         CHARACTERISTICS.put("00002A3F" + UUID_LABEL, "Alert Status");
         CHARACTERISTICS.put("00002A01" + UUID_LABEL, "Appearance");
-        CHARACTERISTICS.put(BATTERY_CHARACTERISTIC_UUID, "Battery Level");
+        CHARACTERISTICS.put(BATTERY_CHARACTERISTIC_UUID.toString(), "Battery Level");
         CHARACTERISTICS.put("00002A49" + UUID_LABEL, "Blood Pressure Feature");
         CHARACTERISTICS.put("00002A35" + UUID_LABEL, "Blood Pressure Measurement");
         CHARACTERISTICS.put("00002A38" + UUID_LABEL, "Body Sensor Location");
