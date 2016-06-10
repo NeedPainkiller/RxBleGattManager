@@ -44,10 +44,13 @@ dependencies {
     //  Guava
     compile 'com.google.guava:guava:19.0'
 
-    // rxjava
+    // RxJava
     compile 'io.reactivex:rxandroid:1.2.0'
     compile 'io.reactivex:rxjava:1.1.5'
 
+    //  RxLifeCycle
+    compile 'com.trello:rxlifecycle:0.6.1'
+    compile 'com.trello:rxlifecycle-components:0.6.1'
 
     // Dagger
     compile 'com.google.dagger:dagger:2.2'
@@ -55,6 +58,9 @@ dependencies {
 
     //  jsr310
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
+
+// If you want to use Navi for providers
+    compile 'com.trello:rxlifecycle-navi:0.6.1'
 }
 repositories {
     maven { url "https://jitpack.io" }
@@ -68,7 +74,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
