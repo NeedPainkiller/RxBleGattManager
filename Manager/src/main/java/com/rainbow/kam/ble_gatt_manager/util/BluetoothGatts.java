@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.rainbow.kam.ble_gatt_manager.data.attributes;
+package com.rainbow.kam.ble_gatt_manager.util;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -44,7 +44,7 @@ import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRIT
 import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
 import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
 
-public class GattAttributes {
+public class BluetoothGatts {
 
     private final static String UNKNOWN = BuildConfig.UNKNOWN;
 
@@ -84,8 +84,7 @@ public class GattAttributes {
     }
 
 
-    public static String resolveValueTypeDescription(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
-        int properties = bluetoothGattCharacteristic.getProperties();
+    public static String resolveValueTypeDescription(int properties) {
         int formatListLength = VALUE_FORMATS.size();
         for (int i = 0; i < formatListLength; i++) {
             int format = VALUE_FORMATS.keyAt(i);
@@ -101,9 +100,8 @@ public class GattAttributes {
     }
 
 
-    public static String getAvailableProperties(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
+    public static String getAvailableProperties(int properties) {
         StringBuilder propertiesString = new StringBuilder();
-        int properties = bluetoothGattCharacteristic.getProperties();
 
         propertiesString.append(String.format("0x%04X", properties));
         for (int props : PROPERTIES.keySet()) {

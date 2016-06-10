@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.rainbow.kam.ble_gatt_manager.data.attributes.BleDeviceAttributes;
+import com.rainbow.kam.ble_gatt_manager.util.BluetoothDevices;
 import com.rainbow.kam.ble_gatt_manager.BuildConfig;
 
 /**
@@ -59,12 +59,12 @@ public class BleDevice implements Comparable<BleDevice> {
 
 
     public String getType() {
-        return BleDeviceAttributes.getType(device.getType());
+        return BluetoothDevices.getType(device.getType());
     }
 
 
     public String getBondState() {
-        return BleDeviceAttributes.getBond(device.getBondState());
+        return BluetoothDevices.getBond(device.getBondState());
     }
 
     public int getRssi() {

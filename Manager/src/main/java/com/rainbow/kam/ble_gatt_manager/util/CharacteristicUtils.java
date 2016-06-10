@@ -1,8 +1,10 @@
 package com.rainbow.kam.ble_gatt_manager.util;
 
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.text.TextUtils;
 
 import com.google.common.collect.Maps;
+import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
 
 import java.util.HashMap;
 
@@ -38,5 +40,22 @@ public class CharacteristicUtils {
             subscriber.onCompleted();
             subscriber.unsubscribe();
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public static  Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex) {
+        return Observable.create(subscriber -> {
+            if (!TextUtils.isEmpty(hex) || hex.length() > 1) {
+                String writeHexValue = hex.replaceAll("[^[0–9][a-f]]", "");
+                byte[] bytes = new byte[(writeHexValue.length() / 2) + 1];
+                int length = bytes.length;
+                for (int i = 0; i < length; ++i) {
+                    bytes[i] = Long.decode("0x" + hex.substring(i * 2, i * 2 + 2)).byteValue();
+                }
+                subscriber.onNext(bytes);
+            } else {
+                subscriber.onError(new WriteCharacteristicException(characteristic, "value is null or empty"));
+            }
+        });
     }
 }

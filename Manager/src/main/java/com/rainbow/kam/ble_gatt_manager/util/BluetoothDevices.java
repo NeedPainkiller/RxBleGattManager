@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.data.attributes;
+package com.rainbow.kam.ble_gatt_manager.util;
 
 import android.util.SparseArray;
 
@@ -7,7 +7,7 @@ import com.rainbow.kam.ble_gatt_manager.BuildConfig;
 /**
  * Created by Kang Young Won on 2016-05-20.
  */
-public class BleDeviceAttributes {
+public class BluetoothDevices {
 
     private final static String UNKNOWN = BuildConfig.UNKNOWN;
 
