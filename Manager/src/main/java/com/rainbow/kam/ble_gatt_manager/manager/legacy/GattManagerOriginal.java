@@ -1,5 +1,5 @@
 
-package com.rainbow.kam.ble_gatt_manager.manager;
+package com.rainbow.kam.ble_gatt_manager.manager.legacy;
 
 import android.app.Activity;
 import android.app.Application;
@@ -17,7 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.primitives.Bytes;
-import com.rainbow.kam.ble_gatt_manager.data.attributes.GattAttributes;
+import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.DisconnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.GattResourceNotDiscoveredException;
@@ -43,9 +43,9 @@ public class GattManagerOriginal {
 
     private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
 
-    private final static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(GattAttributes.CLIENT_CHARACTERISTIC_CONFIG);
-    private final static UUID BATTERY_SERVICE_UUID = UUID.fromString(GattAttributes.BATTERY_SERVICE_UUID);
-    private final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(GattAttributes.BATTERY_CHARACTERISTIC_UUID);
+    private final static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(BluetoothGatts.CLIENT_CHARACTERISTIC_CONFIG);
+    private final static UUID BATTERY_SERVICE_UUID = UUID.fromString(BluetoothGatts.BATTERY_SERVICE_UUID);
+    private final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(BluetoothGatts.BATTERY_CHARACTERISTIC_UUID);
 
     private final Application application;
 
