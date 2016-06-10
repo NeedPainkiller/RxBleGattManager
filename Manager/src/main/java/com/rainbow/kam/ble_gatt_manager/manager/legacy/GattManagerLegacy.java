@@ -37,15 +37,15 @@ import rx.Subscription;
  * Created by kam6512 on 2015-10-29.
  */
 
-public class GattManagerOriginal {
+public class GattManagerLegacy {
 
-    private final static String TAG = GattManagerOriginal.class.getSimpleName();
+    private final static String TAG = GattManagerLegacy.class.getSimpleName();
 
     private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
 
-    private final static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = UUID.fromString(BluetoothGatts.CLIENT_CHARACTERISTIC_CONFIG);
-    private final static UUID BATTERY_SERVICE_UUID = UUID.fromString(BluetoothGatts.BATTERY_SERVICE_UUID);
-    private final static UUID BATTERY_CHARACTERISTIC_UUID = UUID.fromString(BluetoothGatts.BATTERY_CHARACTERISTIC_UUID);
+    private final static UUID CLIENT_CHARACTERISTIC_CONFIG_UUID = BluetoothGatts.CLIENT_CHARACTERISTIC_CONFIG;
+    private final static UUID BATTERY_SERVICE_UUID = BluetoothGatts.BATTERY_SERVICE_UUID;
+    private final static UUID BATTERY_CHARACTERISTIC_UUID = BluetoothGatts.BATTERY_CHARACTERISTIC_UUID;
 
     private final Application application;
 
@@ -63,12 +63,12 @@ public class GattManagerOriginal {
     private BluetoothGattCharacteristic notificationCharacteristic;
 
 
-    public GattManagerOriginal(Activity activity, GattCustomCallbacks gattCustomCallbacks) {
+    public GattManagerLegacy(Activity activity, GattCustomCallbacks gattCustomCallbacks) {
         this(activity.getApplication(), gattCustomCallbacks);
     }
 
 
-    public GattManagerOriginal(Application application, GattCustomCallbacks gattCustomCallbacks) {
+    public GattManagerLegacy(Application application, GattCustomCallbacks gattCustomCallbacks) {
         this.application = application;
         this.gattCustomCallbacks = gattCustomCallbacks;
 
