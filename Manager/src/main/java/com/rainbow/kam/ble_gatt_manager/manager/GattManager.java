@@ -31,7 +31,9 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import hugo.weaving.DebugLog;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -41,6 +43,7 @@ import rx.subjects.PublishSubject;
 /**
  * Created by kam6512 on 2015-10-29.
  */
+@Singleton
 public class GattManager implements GattManagerObserves {
 
     private final static String TAG = GattManager.class.getSimpleName();
@@ -58,11 +61,11 @@ public class GattManager implements GattManagerObserves {
 
     private BluetoothGattDescriptor notificationDescriptor;
 
-    private final PublishSubject<Boolean> connectionSubject = PublishSubject.create();
-    private final PublishSubject<List<BluetoothGattService>> serviceSubject = PublishSubject.create();
-    private final PublishSubject<BluetoothGattCharacteristic> readSubject = PublishSubject.create();
-    private final PublishSubject<BluetoothGattCharacteristic> writeSubject = PublishSubject.create();
-    private final PublishSubject<BluetoothGattCharacteristic> notificationSubject = PublishSubject.create();
+    private PublishSubject<Boolean> connectionSubject;
+    private PublishSubject<List<BluetoothGattService>> serviceSubject;
+    private PublishSubject<BluetoothGattCharacteristic> readSubject;
+    private PublishSubject<BluetoothGattCharacteristic> writeSubject;
+    private PublishSubject<BluetoothGattCharacteristic> notificationSubject;
     private final PublishSubject<Integer> rssiSubject = PublishSubject.create();
 
     private Subscription rssiTimerSubscription;
@@ -102,7 +105,7 @@ public class GattManager implements GattManagerObserves {
 
     @Override public Observable<Boolean> observeConnection(
             BleDevice bleDevice) {
-        return Observable.merge(connectionSubject,
+        return Observable.merge(connectionSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (bleDevice == null) {
                         subscriber.onError(new NullPointerException("BleDevice is Null"));
@@ -158,7 +161,7 @@ public class GattManager implements GattManagerObserves {
                 bluetoothGatt.disconnect();
             } else {
                 bluetoothGatt.close();
-                connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Device already Disconnected"));
+//                connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Device already Disconnected"));
             }
         } else {
             connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Gatt / Adapter is not available or disabled"));
@@ -199,29 +202,22 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    @Override public Observable<Integer> observeRssi() {
-        return Observable.merge(rssiSubject, Observable.create(readRssiValue())
-                .doOnSubscribe(() -> rssiTimerSubscription.unsubscribe())
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread()));
-    }
-
-
-    private Observable.OnSubscribe<Integer> readRssiValue() {
-        return subscriber -> {
-            if (isConnected()) {
-                rssiTimerSubscription = Observable.interval(RSSI_UPDATE_TIME_INTERVAL, TimeUnit.SECONDS)
-                        .subscribe(aLong -> bluetoothGatt.readRemoteRssi());
-            } else {
-                subscriber.unsubscribe();
-            }
-        };
+    @DebugLog @Override public Observable<Integer> observeRssi() {
+        return Observable.merge(rssiSubject,
+                Observable.create((Observable.OnSubscribe<Integer>) subscriber -> {
+                    if (isConnected()) {
+                        rssiTimerSubscription = Observable.interval(RSSI_UPDATE_TIME_INTERVAL, TimeUnit.SECONDS)
+                                .subscribe(aLong -> bluetoothGatt.readRemoteRssi());
+                    } else {
+                        subscriber.unsubscribe();
+                    }
+                }).doOnUnsubscribe(() -> rssiTimerSubscription.unsubscribe()));
     }
 
 
     @Override
     public Observable<List<BluetoothGattService>> observeDiscoverService() {
-        return Observable.merge(serviceSubject,
+        return Observable.merge(serviceSubject = PublishSubject.create(),
                 Observable.create(subscriber -> bluetoothGatt.discoverServices()))
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -242,7 +238,7 @@ public class GattManager implements GattManagerObserves {
 
     @Override
     public Observable<BluetoothGattCharacteristic> observeRead(BluetoothGattCharacteristic characteristicToRead) {
-        return Observable.merge(readSubject,
+        return Observable.merge(readSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (characteristicToRead == null) {
                         subscriber.onError(UUID_CHARACTERLESS);
@@ -274,7 +270,7 @@ public class GattManager implements GattManagerObserves {
 
     @Override
     public Observable<BluetoothGattCharacteristic> observeWrite(BluetoothGattCharacteristic characteristicToWrite, byte[] valuesToWrite) {
-        return Observable.merge(writeSubject,
+        return Observable.merge(writeSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (characteristicToWrite == null) {
                         subscriber.onError(UUID_CHARACTERLESS);
@@ -299,7 +295,7 @@ public class GattManager implements GattManagerObserves {
 
     @Override
     public Observable<BluetoothGattCharacteristic> observeNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
-        return Observable.merge(notificationSubject,
+        return Observable.merge(notificationSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (characteristicToNotification == null) {
                         subscriber.onError(UUID_CHARACTERLESS);
@@ -353,7 +349,7 @@ public class GattManager implements GattManagerObserves {
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onServicesDiscovered(BluetoothGatt bluetoothGatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 serviceSubject.onNext(bluetoothGatt.getServices());
@@ -363,11 +359,12 @@ public class GattManager implements GattManagerObserves {
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onCharacteristicRead(BluetoothGatt bluetoothGatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 readSubject.onNext(characteristic);
+                readSubject.onCompleted();
             } else {
                 readSubject.onError(
                         new ReadCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
@@ -375,14 +372,15 @@ public class GattManager implements GattManagerObserves {
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onCharacteristicChanged(BluetoothGatt bluetoothGatt,
                                             BluetoothGattCharacteristic characteristic) {
             writeSubject.onNext(characteristic);
+            writeSubject.onCompleted();
         }
 
 
-        @Override
+        @DebugLog @Override
         public void onCharacteristicWrite(BluetoothGatt bluetoothGatt,
                                           BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -397,8 +395,10 @@ public class GattManager implements GattManagerObserves {
         @Override
         public void onReadRemoteRssi(BluetoothGatt bluetoothGatt, int rssi, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.e(TAG, "onReadRemoteRssi : next");
                 rssiSubject.onNext(rssi);
             } else {
+                Log.e(TAG, "onReadRemoteRssi : onError");
                 rssiSubject.onError(new RssiMissException(status));
             }
         }
@@ -413,6 +413,5 @@ public class GattManager implements GattManagerObserves {
                         new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status));
             }
         }
-
     };
 }
