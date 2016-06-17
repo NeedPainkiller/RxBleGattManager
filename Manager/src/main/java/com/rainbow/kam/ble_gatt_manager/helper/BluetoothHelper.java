@@ -21,7 +21,7 @@ import rx.functions.Action0;
  */
 public class BluetoothHelper {
 
-    private static final boolean IS_BLE_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    public static final boolean IS_BLE_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
     private static final int REQUEST_ENABLE_BLE = 1;
     private static final int RESULT_OK = -1;
@@ -32,19 +32,17 @@ public class BluetoothHelper {
     private static final String PERMISSION_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
 
 
-    public boolean isBleSupported() {
-        return IS_BLE_SUPPORTED;
+    public Action0 requestPermissionAction0(Activity activity) {
+        return () -> requestPermission(activity);
     }
 
 
     @TargetApi(Build.VERSION_CODES.M)
-    public Action0 requestBluetoothPermission(Activity activity) {
-        return () -> {
-            if (ContextCompat.checkSelfPermission(activity, PERMISSION_COARSE) != PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(activity, PERMISSION_FINE) != PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, new String[]{PERMISSION_COARSE, PERMISSION_FINE}, REQUEST_ENABLE_BLE);
-            }
-        };
+    public void requestPermission(Activity activity) {
+        if (ContextCompat.checkSelfPermission(activity, PERMISSION_COARSE) != PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(activity, PERMISSION_FINE) != PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{PERMISSION_COARSE, PERMISSION_FINE}, REQUEST_ENABLE_BLE);
+        }
     }
 
 
@@ -56,25 +54,27 @@ public class BluetoothHelper {
                     subscriber.onNext(true);
                 } else {
                     subscriber.onNext(false);
-                    subscriber.onCompleted();
                 }
             } else {
                 subscriber.onNext(false);
-                subscriber.onCompleted();
             }
+            subscriber.onCompleted();
         });
     }
 
 
-    public Action0 requestBluetoothEnable(Activity activity) {
-        return () -> {
-            BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
-            BluetoothAdapter adapter = bluetoothManager.getAdapter();
-            if (adapter != null && !adapter.isEnabled()) {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                ActivityCompat.startActivityForResult(activity, intent, REQUEST_ENABLE_BLE, null);
-            }
-        };
+    public Action0 requestPowerAction(Activity activity) {
+        return () -> requestPower(activity);
+    }
+
+
+    public void requestPower(Activity activity) {
+        BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter adapter = bluetoothManager.getAdapter();
+        if (adapter != null && !adapter.isEnabled()) {
+            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ActivityCompat.startActivityForResult(activity, intent, REQUEST_ENABLE_BLE, null);
+        }
     }
 
 
@@ -84,8 +84,8 @@ public class BluetoothHelper {
                 subscriber.onNext(true);
             } else {
                 subscriber.onNext(false);
-                subscriber.onCompleted();
             }
+            subscriber.onCompleted();
         });
     }
 }
