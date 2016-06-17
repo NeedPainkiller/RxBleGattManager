@@ -19,7 +19,7 @@ import rx.subjects.PublishSubject;
 /**
  * Created by Kang Young Won on 2016-05-24.
  */
-public class RxBle {
+public class RxBleScanner {
 
     private final BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner scanner;
@@ -35,12 +35,12 @@ public class RxBle {
     };
 
 
-    @Inject public RxBle(final Activity activity) {
+    @Inject public RxBleScanner(final Activity activity) {
         this(activity.getApplication());
     }
 
 
-    public RxBle(final Application application) {
+    public RxBleScanner(final Application application) {
         BluetoothManager manager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
         scanner = bluetoothAdapter.getBluetoothLeScanner();
