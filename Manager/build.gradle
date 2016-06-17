@@ -1,11 +1,24 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.jakewharton.hugo'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'kam6512'
+    groupId = 'com.rainbow.library'
+    artifactId = 'android-ble-gatt-manager'
+    publishVersion = '0.1.1'
+    desc = 'Android BLE GATT MANAGER'
+    website = 'https://github.com/kam6512/BLE-Gatt_Manager'
+    issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
+    repository = "https://github.com/kam6512/BLE-Gatt_Manager.git"
+}
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
+
     compileOptions {
         encoding = 'UTF-8'
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -59,7 +72,7 @@ dependencies {
     //  jsr310
     compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
 
-// If you want to use Navi for providers
+    // If you want to use Navi for providers
     compile 'com.trello:rxlifecycle-navi:0.6.1'
 }
 repositories {
@@ -69,14 +82,17 @@ repositories {
 
 buildscript {
     repositories {
-        mavenCentral()
+        mavenLocal()
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
+//gradlew clean build bintrayUpload -PbintrayUser=kam6512 -PbintrayKey=4fba1f817f5c76e79438bed1d2db9bc67ce99b7e -PdryRun=false
+
