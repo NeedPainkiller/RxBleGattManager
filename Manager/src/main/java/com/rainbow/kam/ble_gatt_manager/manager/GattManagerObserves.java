@@ -15,6 +15,7 @@ import rx.Observable;
  */
 public interface GattManagerObserves {
 
+
     Observable<Boolean> observeConnection();
 
     Observable<Boolean> observeConnection(BleDevice bleDevice);
@@ -42,6 +43,10 @@ public interface GattManagerObserves {
     Observable<BluetoothGattCharacteristic> observeNotification(
             final UUID uuidToNotification, boolean enableNotification);
 
-    Observable<BluetoothGattCharacteristic> observeNotification(
-            final BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification);
+
+    Observable<BluetoothGattCharacteristic> observeCommandNotification(
+            final BluetoothGattCharacteristic uuidToNotification, boolean enableNotification);
+
+    Observable<BluetoothGattCharacteristic> observeCustomNotification(
+            final BluetoothGattCharacteristic uuidToNotification, boolean enableNotification);
 }

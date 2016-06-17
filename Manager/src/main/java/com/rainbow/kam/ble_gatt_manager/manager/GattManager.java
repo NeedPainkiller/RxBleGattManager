@@ -59,14 +59,17 @@ public class GattManager implements GattManagerObserves {
     private BluetoothGatt bluetoothGatt;
     private BluetoothDevice bluetoothDevice;
 
+    private BluetoothGattCharacteristic commandCharacteristic;
+
     private BluetoothGattDescriptor notificationDescriptor;
 
     private PublishSubject<Boolean> connectionSubject;
     private PublishSubject<List<BluetoothGattService>> serviceSubject;
     private PublishSubject<BluetoothGattCharacteristic> readSubject;
     private PublishSubject<BluetoothGattCharacteristic> writeSubject;
-    private PublishSubject<BluetoothGattCharacteristic> notificationSubject;
-    private final PublishSubject<Integer> rssiSubject = PublishSubject.create();
+    private PublishSubject<BluetoothGattCharacteristic> commandNotificationSubject;
+    private PublishSubject<BluetoothGattCharacteristic> customNotificationSubject;
+    private PublishSubject<Integer> rssiSubject;
 
     private Subscription rssiTimerSubscription;
 
@@ -161,7 +164,6 @@ public class GattManager implements GattManagerObserves {
                 bluetoothGatt.disconnect();
             } else {
                 bluetoothGatt.close();
-//                connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Device already Disconnected"));
             }
         } else {
             connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Gatt / Adapter is not available or disabled"));
@@ -190,9 +192,12 @@ public class GattManager implements GattManagerObserves {
         if (writeSubject != null) {
             writeSubject.onCompleted();
         }
-        if (notificationSubject != null) {
-            notificationSubject.onCompleted();
+        if (commandNotificationSubject != null) {
+            commandNotificationSubject.onCompleted();
         }
+//        if (notificationSubject != null) {
+//            notificationSubject.onCompleted();
+//        }
         if (rssiSubject != null) {
             rssiSubject.onCompleted();
         }
@@ -203,7 +208,7 @@ public class GattManager implements GattManagerObserves {
 
 
     @DebugLog @Override public Observable<Integer> observeRssi() {
-        return Observable.merge(rssiSubject,
+        return Observable.merge(rssiSubject = PublishSubject.create(),
                 Observable.create((Observable.OnSubscribe<Integer>) subscriber -> {
                     if (isConnected()) {
                         rssiTimerSubscription = Observable.interval(RSSI_UPDATE_TIME_INTERVAL, TimeUnit.SECONDS)
@@ -289,13 +294,32 @@ public class GattManager implements GattManagerObserves {
 
     @Override
     public Observable<BluetoothGattCharacteristic> observeNotification(UUID uuidToNotification, boolean enableNotification) {
-        return observeNotification(findCharacteristic(uuidToNotification), enableNotification);
+        return observeCustomNotification(findCharacteristic(uuidToNotification), enableNotification);
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
-        return Observable.merge(notificationSubject = PublishSubject.create(),
+    public Observable<BluetoothGattCharacteristic> observeCommandNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
+        return Observable.merge(commandNotificationSubject = PublishSubject.create(),
+                Observable.create(subscriber -> {
+                    if (characteristicToNotification == null) {
+                        subscriber.onError(UUID_CHARACTERLESS);
+                    }
+                    commandCharacteristic = characteristicToNotification;
+                    bluetoothGatt.setCharacteristicNotification(commandCharacteristic, enableNotification);
+                    notificationDescriptor = commandCharacteristic.getDescriptor(BluetoothGatts.CLIENT_CHARACTERISTIC_CONFIG);
+                    byte[] value = enableNotification ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
+                    notificationDescriptor.setValue(value);
+                    bluetoothGatt.writeDescriptor(notificationDescriptor);
+                }))
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    @Override
+    public Observable<BluetoothGattCharacteristic> observeCustomNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
+        return Observable.merge(customNotificationSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (characteristicToNotification == null) {
                         subscriber.onError(UUID_CHARACTERLESS);
@@ -353,6 +377,7 @@ public class GattManager implements GattManagerObserves {
         public void onServicesDiscovered(BluetoothGatt bluetoothGatt, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 serviceSubject.onNext(bluetoothGatt.getServices());
+                serviceSubject.onCompleted();
             } else {
                 serviceSubject.onError(new GattResourceNotDiscoveredException("ServicesDiscovered FAIL"));
             }
@@ -407,10 +432,19 @@ public class GattManager implements GattManagerObserves {
         @Override
         public void onDescriptorWrite(BluetoothGatt bluetoothGatt, BluetoothGattDescriptor descriptor, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS && descriptor.equals(notificationDescriptor)) {
-                notificationSubject.onNext(descriptor.getCharacteristic());
+                if (descriptor.getCharacteristic().equals(commandCharacteristic)) {
+                    commandNotificationSubject.onNext(descriptor.getCharacteristic());
+                } else {
+                    customNotificationSubject.onNext(descriptor.getCharacteristic());
+                }
+
             } else {
-                notificationSubject.onError(
-                        new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status));
+                NotificationCharacteristicException exception = new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status);
+                if (descriptor.getCharacteristic().equals(commandCharacteristic)) {
+                    commandNotificationSubject.onError(exception);
+                } else {
+                    customNotificationSubject.onError(exception);
+                }
             }
         }
     };
