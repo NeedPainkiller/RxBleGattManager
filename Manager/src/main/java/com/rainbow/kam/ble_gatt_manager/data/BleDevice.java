@@ -20,7 +20,7 @@ public class BleDevice implements Comparable<BleDevice> {
     private int rssi;
 
 
-    public BleDevice(BluetoothDevice device, int rssi) {
+    private BleDevice(BluetoothDevice device, int rssi) {
         this.device = device;
         this.rssi = rssi;
     }
@@ -29,7 +29,9 @@ public class BleDevice implements Comparable<BleDevice> {
     public static BleDevice create(BluetoothDevice device, int rssi) {
         return new BleDevice(device, rssi);
     }
-    public static BleDevice create(BluetoothDevice device ) {
+
+
+    public static BleDevice create(BluetoothDevice device) {
         return new BleDevice(device, 0);
     }
 
@@ -66,6 +68,7 @@ public class BleDevice implements Comparable<BleDevice> {
     public String getBondState() {
         return BluetoothDevices.getBond(device.getBondState());
     }
+
 
     public int getRssi() {
         return rssi;
