@@ -12,9 +12,9 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.common.base.Strings;
 import com.google.common.primitives.Bytes;
 import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
@@ -31,7 +31,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import hugo.weaving.DebugLog;
 import rx.Observable;
@@ -43,7 +42,6 @@ import rx.subjects.PublishSubject;
 /**
  * Created by kam6512 on 2015-10-29.
  */
-@Singleton
 public class GattManager implements GattManagerObserves {
 
     private final static String TAG = GattManager.class.getSimpleName();
@@ -106,29 +104,37 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    @Override public Observable<Boolean> observeConnection(
-            BleDevice bleDevice) {
-        return Observable.merge(connectionSubject = PublishSubject.create(),
+    @Override
+    public Observable<Boolean> observeConnection(BleDevice bleDevice) {
+        return Observable.merge(
+                connectionSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
-                    if (bleDevice == null) {
-                        subscriber.onError(new NullPointerException("BleDevice is Null"));
+
+                    if (app == null) {
+                        subscriber.onError(new NullPointerException("Application is Null"));
                     }
+
+                    if (bluetoothManager == null || bluetoothAdapter == null) {
+                        setBluetooth();
+
+                        if (!bluetoothAdapter.isEnabled()) {
+                            subscriber.onError(new ConnectedFailException(deviceAddress, "Adapter is not available or disabled"));
+                        }
+                    }
+
 
                     device = bleDevice;
                     deviceAddress = device.getAddress();
 
 
-                    if (TextUtils.isEmpty(deviceAddress)) {
+                    if (device == null) {
+                        subscriber.onError(new NullPointerException("BleDevice is Null"));
+                    }
+
+                    if (Strings.isNullOrEmpty(deviceAddress)) {
                         subscriber.onError(new ConnectedFailException(deviceAddress, "Address is not available"));
                     }
 
-                    if (bluetoothManager == null || bluetoothAdapter == null) {
-                        setBluetooth();
-                    }
-
-                    if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-                        subscriber.onError(new ConnectedFailException(deviceAddress, "Adapter is not available or disabled"));
-                    }
 
                     bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
 
@@ -136,10 +142,6 @@ public class GattManager implements GattManagerObserves {
                         subscriber.onError(new ConnectedFailException(deviceAddress, "this Device not Supported BLE"));
                     }
 
-
-                    if (app == null) {
-                        subscriber.onError(new NullPointerException("Application is Null"));
-                    }
 
                     if (isConnected()) {
                         subscriber.onNext(true);
@@ -207,7 +209,7 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    @DebugLog @Override public Observable<Integer> observeRssi() {
+    @Override public Observable<Integer> observeRssi() {
         return Observable.merge(rssiSubject = PublishSubject.create(),
                 Observable.create((Observable.OnSubscribe<Integer>) subscriber -> {
                     if (isConnected()) {
@@ -245,10 +247,11 @@ public class GattManager implements GattManagerObserves {
     public Observable<BluetoothGattCharacteristic> observeRead(BluetoothGattCharacteristic characteristicToRead) {
         return Observable.merge(readSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
-                    if (characteristicToRead == null) {
+                    if (characteristicToRead != null) {
+                        bluetoothGatt.readCharacteristic(characteristicToRead);
+                    } else {
                         subscriber.onError(UUID_CHARACTERLESS);
                     }
-                    bluetoothGatt.readCharacteristic(characteristicToRead);
                 }))
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -277,14 +280,15 @@ public class GattManager implements GattManagerObserves {
     public Observable<BluetoothGattCharacteristic> observeWrite(BluetoothGattCharacteristic characteristicToWrite, byte[] valuesToWrite) {
         return Observable.merge(writeSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
-                    if (characteristicToWrite == null) {
+                    if (characteristicToWrite != null) {
+                        if (valuesToWrite == null || valuesToWrite.length == 0) {
+                            subscriber.onError(new WriteCharacteristicException(characteristicToWrite, "data is Null or Empty"));
+                        }
+                        characteristicToWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                        characteristicToWrite.setValue(valuesToWrite);
+                    } else {
                         subscriber.onError(UUID_CHARACTERLESS);
                     }
-                    if (valuesToWrite.length == 0) {
-                        subscriber.onError(new WriteCharacteristicException(characteristicToWrite, "data is Null or Empty"));
-                    }
-                    characteristicToWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                    characteristicToWrite.setValue(valuesToWrite);
                     bluetoothGatt.writeCharacteristic(characteristicToWrite);
                 }))
                 .subscribeOn(Schedulers.computation())

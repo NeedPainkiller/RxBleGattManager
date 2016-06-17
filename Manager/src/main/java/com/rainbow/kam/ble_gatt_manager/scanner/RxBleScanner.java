@@ -1,12 +1,9 @@
 package com.rainbow.kam.ble_gatt_manager.scanner;
 
-import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.Context;
 
 import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
 
@@ -20,41 +17,50 @@ import rx.subjects.PublishSubject;
  */
 public class RxBleScanner {
 
-    private final BluetoothAdapter bluetoothAdapter;
+    private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner scanner;
+    private PublishSubject<BleDevice> scanSubject;
 
-    private PublishSubject<BleDevice> scanSubject = PublishSubject.create();
+
+    @Inject public RxBleScanner() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    }
+
 
     private final ScanCallback callback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
-            scanSubject.onNext(BleDevice.create(result));
+            BleDevice discoveredDevice = BleDevice.create(result);
+            scanSubject.onNext(discoveredDevice);
         }
     };
 
 
-    @Inject public RxBleScanner(final Application application) {
-        BluetoothManager manager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
-        bluetoothAdapter = manager.getAdapter();
-        scanner = bluetoothAdapter.getBluetoothLeScanner();
+    private boolean isScanAvailable() {
+        return !(bluetoothAdapter == null || !bluetoothAdapter.isEnabled());
     }
 
 
-    public Observable<BleDevice> observe() {
-        if (!bluetoothAdapter.isEnabled()) {
+    public Observable<BleDevice> observeScan() {
+        if (!isScanAvailable()) {
             return Observable.empty();
         }
-        return Observable.merge(Observable.create((Observable.OnSubscribe<BleDevice>) subscriber -> {
-            if (scanner == null) {
-                scanner = bluetoothAdapter.getBluetoothLeScanner();
-            }
-            scanner.startScan(callback);
-        }), scanSubject).onBackpressureBuffer().doOnSubscribe(() -> {
-            if (scanner != null && bluetoothAdapter.isEnabled()) {
-                scanner.stopScan(callback);
-            }
-        });
+
+        return Observable.merge(
+                scanSubject = PublishSubject.create(),
+                Observable.create(subscriber -> {
+                    if (isScanAvailable() && scanner == null) {
+                        scanner = bluetoothAdapter.getBluetoothLeScanner();
+                    }
+                    scanner.startScan(callback);
+                }))
+                .onBackpressureBuffer()
+                .doOnSubscribe(() -> {
+                    if (scanner != null && isScanAvailable()) {
+                        scanner.stopScan(callback);
+                    }
+                });
     }
 }
 
