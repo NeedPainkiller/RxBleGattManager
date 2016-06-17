@@ -46,7 +46,7 @@ public class CharacteristicUtils {
     public static  Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex) {
         return Observable.create(subscriber -> {
             if (!TextUtils.isEmpty(hex) || hex.length() > 1) {
-                String writeHexValue = hex.replaceAll("[^[0–9][a-f]]", "");
+                String writeHexValue = hex.replaceAll("[^[0-9][a-f]]", "");
                 byte[] bytes = new byte[(writeHexValue.length() / 2) + 1];
                 int length = bytes.length;
                 for (int i = 0; i < length; ++i) {

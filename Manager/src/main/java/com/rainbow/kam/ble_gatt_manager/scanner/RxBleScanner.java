@@ -1,6 +1,5 @@
 package com.rainbow.kam.ble_gatt_manager.scanner;
 
-import android.app.Activity;
 import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
@@ -35,12 +34,7 @@ public class RxBleScanner {
     };
 
 
-    @Inject public RxBleScanner(final Activity activity) {
-        this(activity.getApplication());
-    }
-
-
-    public RxBleScanner(final Application application) {
+    @Inject public RxBleScanner(final Application application) {
         BluetoothManager manager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = manager.getAdapter();
         scanner = bluetoothAdapter.getBluetoothLeScanner();
