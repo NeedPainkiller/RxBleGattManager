@@ -40,13 +40,17 @@ public interface GattManagerObserves {
     Observable<BluetoothGattCharacteristic> observeWrite(final BluetoothGattCharacteristic characteristicToWrite,
                                                          final byte[] valuesToWrite);
 
+    Observable<BluetoothGattCharacteristic> observeNotification(final UUID uuidToNotification,
+                                                                boolean enableNotification);
+
+
     Observable<BluetoothGattCharacteristic> observeNotification(
-            final UUID uuidToNotification, boolean enableNotification);
+            final BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification);
+
+    Observable<BluetoothGattCharacteristic> observeIndication(final UUID uuidToIndication,
+                                                              boolean enableIndication);
 
 
-    Observable<BluetoothGattCharacteristic> observeCommandNotification(
-            final BluetoothGattCharacteristic uuidToNotification, boolean enableNotification);
-
-    Observable<BluetoothGattCharacteristic> observeCustomNotification(
-            final BluetoothGattCharacteristic uuidToNotification, boolean enableNotification);
+    Observable<BluetoothGattCharacteristic> observeIndication(
+            final BluetoothGattCharacteristic characteristicToIndication, boolean enableIndication);
 }
