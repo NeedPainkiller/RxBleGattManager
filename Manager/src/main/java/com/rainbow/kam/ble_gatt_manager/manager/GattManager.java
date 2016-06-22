@@ -11,11 +11,14 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Bytes;
-import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
+import com.rainbow.kam.ble_gatt_manager.exceptions.GattException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.DisconnectedFailException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.GattResourceNotDiscoveredException;
@@ -23,6 +26,8 @@ import com.rainbow.kam.ble_gatt_manager.exceptions.details.NotificationCharacter
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.ReadCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.RssiMissException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
+import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
 
 import java.util.List;
@@ -33,15 +38,18 @@ import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
 import rx.Observable;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.Subscriptions;
+
+import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.STATE_ON_NEXT;
+import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.STATE_ON_START;
 
 /**
  * Created by kam6512 on 2015-10-29.
  */
 public class GattManager implements GattManagerObserves {
-
-    private final static String TAG = GattManager.class.getSimpleName();
 
     private final static long RSSI_UPDATE_TIME_INTERVAL = 3;
     private final Application app;
@@ -51,7 +59,6 @@ public class GattManager implements GattManagerObserves {
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
-    private BluetoothDevice bluetoothDevice;
 
     private PublishSubject<Boolean> connectionSubject;
 
@@ -60,12 +67,12 @@ public class GattManager implements GattManagerObserves {
 
     private PublishSubject<List<BluetoothGattService>> serviceSubject;
 
-    private PublishSubject<BluetoothGattCharacteristic> readSubject;
-    private PublishSubject<BluetoothGattCharacteristic> writeSubject;
+    private PublishSubject<GattObserveData> readSubject;
+    private PublishSubject<GattObserveData> writeSubject;
 
-    private PublishSubject<BluetoothGattCharacteristic> notificationSubject;
+    private PublishSubject<GattObserveData> notificationSubject;
     private BluetoothGattCharacteristic currentNotificationCharacteristic;
-    private PublishSubject<BluetoothGattCharacteristic> indicationSubject;
+    private PublishSubject<GattObserveData> indicationSubject;
     private BluetoothGattCharacteristic currentIndicationCharacteristic;
 
 
@@ -87,12 +94,12 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    public BluetoothGatt getGatt() {
+    @Override public BluetoothGatt getGatt() {
         return bluetoothGatt;
     }
 
 
-    public BleDevice getBleDevice() {
+    @Override public BleDevice getBleDevice() {
         return device;
     }
 
@@ -109,6 +116,7 @@ public class GattManager implements GattManagerObserves {
                 Observable.create(subscriber -> {
                     device = bleDevice;
                     String deviceAddress = device.getAddress();
+                    BluetoothDevice bluetoothDevice = device.getDevice();
 
 
                     if (app == null) {
@@ -129,30 +137,29 @@ public class GattManager implements GattManagerObserves {
                     if (Strings.isNullOrEmpty(deviceAddress)) {
                         subscriber.onError(new ConnectedFailException(deviceAddress, "Address is not available"));
                     }
-
-                    bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
-
-                    if (bluetoothDevice == null) {
-                        subscriber.onError(new ConnectedFailException(deviceAddress, "this Device not Supported BLE"));
-                    }
-
-
+//                    bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
+//                    if (bluetoothDevice == null) {
+//                        subscriber.onError(new ConnectedFailException(deviceAddress, "this Device not Supported BLE"));
+//                    }else {
+//                        bluetoothDevice.createBond();
+//                    }
                     if (isConnected()) {
                         subscriber.onNext(true);
                     } else {
-                        bluetoothGatt = bluetoothDevice.connectGatt(app, false, bluetoothGattCallback);
+                        GattManagerCallBack callBack = new GattManagerCallBack();
+                        bluetoothGatt = bluetoothDevice.connectGatt(app, false, callBack);
                     }
                 }));
     }
 
 
-    public boolean isConnected() {
+    @Override public boolean isConnected() {
         return bluetoothManager.getConnectionState(device.getDevice(),
                 BluetoothProfile.GATT) == BluetoothProfile.STATE_CONNECTED;
     }
 
 
-    public void disconnect() {
+    @Override public void disconnect() {
         if (bluetoothGatt != null && bluetoothAdapter != null) {
             if (bluetoothAdapter.isEnabled() && isConnected()) {
                 bluetoothGatt.disconnect();
@@ -173,13 +180,6 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    private <T> void completeSubject(PublishSubject<T> subject) {
-        if (subject != null) {
-            subject.onCompleted();
-        }
-    }
-
-
     private void disableAllGattSubject() {
         completeSubject(connectionSubject);
         completeSubject(serviceSubject);
@@ -188,6 +188,21 @@ public class GattManager implements GattManagerObserves {
         completeSubject(notificationSubject);
         completeSubject(indicationSubject);
         completeSubject(rssiSubject);
+    }
+
+
+    private <T> void completeSubject(PublishSubject<T> subject) {
+        if (subject != null) {
+            subject.onCompleted();
+        }
+    }
+
+
+    @Override public Observable<BluetoothDevice> observeBond() {
+        final BluetoothDevice bluetoothDevice = getBleDevice().getDevice();
+        bluetoothDevice.createBond();
+        final IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        return Observable.create(new BondDeviceBroadcastReceiver(app, filter));
     }
 
 
@@ -209,28 +224,27 @@ public class GattManager implements GattManagerObserves {
     public Observable<List<BluetoothGattService>> observeDiscoverService() {
         serviceSubject = PublishSubject.create();
         Observable<List<BluetoothGattService>> discoverGattServiceObservable =
-                Observable.create((Observable.OnSubscribe<List<BluetoothGattService>>) subscriber -> bluetoothGatt.discoverServices())
-                        ;
+                Observable.create((Observable.OnSubscribe<List<BluetoothGattService>>) subscriber -> {
+                    bluetoothGatt.discoverServices();
+                });
         return Observable.merge(serviceSubject, discoverGattServiceObservable);
     }
 
 
-    @Override
-    public Observable<BluetoothGattCharacteristic> observeBattery() {
+    @Override public Observable<GattObserveData> observeBattery() {
         return observeRead(BluetoothGatts.BATTERY_CHARACTERISTIC_UUID);
     }
 
 
-    @Override
-    public Observable<BluetoothGattCharacteristic> observeRead(UUID uuidToRead) {
+    @Override public Observable<GattObserveData> observeRead(UUID uuidToRead) {
         return observeRead(findCharacteristic(uuidToRead));
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeRead(BluetoothGattCharacteristic characteristicToRead) {
+    public Observable<GattObserveData> observeRead(BluetoothGattCharacteristic characteristicToRead) {
         readSubject = PublishSubject.create();
-        Observable<BluetoothGattCharacteristic> readObservable = Observable.create((Observable.OnSubscribe<BluetoothGattCharacteristic>) subscriber -> {
+        Observable<GattObserveData> readObservable = Observable.create((Observable.OnSubscribe<GattObserveData>) subscriber -> {
             if (characteristicToRead != null) {
                 bluetoothGatt.readCharacteristic(characteristicToRead);
             } else {
@@ -242,27 +256,27 @@ public class GattManager implements GattManagerObserves {
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeWrite(UUID uuidToWrite, List<Byte> valuesToWrite) {
+    public Observable<GattObserveData> observeWrite(UUID uuidToWrite, List<Byte> valuesToWrite) {
         return observeWrite(findCharacteristic(uuidToWrite), valuesToWrite);
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeWrite(UUID uuidToWrite, byte[] valuesToWrite) {
+    public Observable<GattObserveData> observeWrite(UUID uuidToWrite, byte[] valuesToWrite) {
         return observeWrite(findCharacteristic(uuidToWrite), valuesToWrite);
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeWrite(BluetoothGattCharacteristic characteristicToWrite, List<Byte> valuesToWrite) {
+    public Observable<GattObserveData> observeWrite(BluetoothGattCharacteristic characteristicToWrite, List<Byte> valuesToWrite) {
         return observeWrite(characteristicToWrite, Bytes.toArray(valuesToWrite));
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeWrite(BluetoothGattCharacteristic characteristicToWrite, byte[] valuesToWrite) {
+    public Observable<GattObserveData> observeWrite(BluetoothGattCharacteristic characteristicToWrite, byte[] valuesToWrite) {
         writeSubject = PublishSubject.create();
-        Observable<BluetoothGattCharacteristic> writeObservable = Observable.create((Observable.OnSubscribe<BluetoothGattCharacteristic>) subscriber -> {
+        Observable<GattObserveData> writeObservable = Observable.create((Observable.OnSubscribe<GattObserveData>) subscriber -> {
             if (characteristicToWrite != null) {
                 if (valuesToWrite == null || valuesToWrite.length == 0) {
                     subscriber.onError(new WriteCharacteristicException(characteristicToWrite, "data is Null or Empty"));
@@ -279,17 +293,17 @@ public class GattManager implements GattManagerObserves {
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeNotification(UUID uuidToNotification, boolean enableNotification) {
+    public Observable<GattObserveData> observeNotification(UUID uuidToNotification, boolean enableNotification) {
         return observeNotification(findCharacteristic(uuidToNotification), enableNotification);
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
+    public Observable<GattObserveData> observeNotification(BluetoothGattCharacteristic characteristicToNotification, boolean enableNotification) {
         notificationSubject = PublishSubject.create();
         currentNotificationCharacteristic = characteristicToNotification;
-        Observable<BluetoothGattCharacteristic> notificationObservable =
-                Observable.create((Observable.OnSubscribe<BluetoothGattCharacteristic>) subscriber -> {
+        Observable<GattObserveData> notificationObservable =
+                Observable.create((Observable.OnSubscribe<GattObserveData>) subscriber -> {
                     if (currentNotificationCharacteristic != null) {
                         bluetoothGatt.setCharacteristicNotification(currentNotificationCharacteristic, enableNotification);
                         BluetoothGattDescriptor notificationDescriptor;
@@ -305,6 +319,7 @@ public class GattManager implements GattManagerObserves {
     }
 
 
+    @Override
     public Observable<Boolean> isNotificationEnabled(BluetoothGattCharacteristic characteristic) {
         return Observable.create(subscriber -> {
             if (characteristic != null) {
@@ -319,17 +334,17 @@ public class GattManager implements GattManagerObserves {
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeIndication(UUID uuidToIndication, boolean enableIndication) {
+    public Observable<GattObserveData> observeIndication(UUID uuidToIndication, boolean enableIndication) {
         return observeIndication(findCharacteristic(uuidToIndication), enableIndication);
     }
 
 
     @Override
-    public Observable<BluetoothGattCharacteristic> observeIndication(BluetoothGattCharacteristic characteristicToIndication, boolean enableIndication) {
+    public Observable<GattObserveData> observeIndication(BluetoothGattCharacteristic characteristicToIndication, boolean enableIndication) {
         indicationSubject = PublishSubject.create();
         currentIndicationCharacteristic = characteristicToIndication;
-        Observable<BluetoothGattCharacteristic> indicationObservable =
-                Observable.create((Observable.OnSubscribe<BluetoothGattCharacteristic>) subscriber -> {
+        Observable<GattObserveData> indicationObservable =
+                Observable.create((Observable.OnSubscribe<GattObserveData>) subscriber -> {
                     if (currentIndicationCharacteristic != null) {
                         bluetoothGatt.setCharacteristicNotification(currentIndicationCharacteristic, enableIndication);
                         if (enableIndication) {
@@ -346,7 +361,7 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    public BluetoothGattCharacteristic findCharacteristic(UUID uuid) {
+    @Override public BluetoothGattCharacteristic findCharacteristic(UUID uuid) {
         for (BluetoothGattService service : bluetoothGatt.getServices()) {
             for (BluetoothGattCharacteristic characteristic : service.getCharacteristics()) {
                 if (characteristic.getUuid().equals(uuid)) {
@@ -358,8 +373,7 @@ public class GattManager implements GattManagerObserves {
     }
 
 
-    private final BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
-
+    class GattManagerCallBack extends BluetoothGattCallback {
         @Override
         public void onConnectionStateChange(BluetoothGatt bluetoothGatt,
                                             int status, int newState) {
@@ -387,7 +401,7 @@ public class GattManager implements GattManagerObserves {
         public void onCharacteristicRead(BluetoothGatt bluetoothGatt,
                                          BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                readSubject.onNext(characteristic);
+                readSubject.onNext(new GattObserveData(characteristic, STATE_ON_NEXT));
                 readSubject.onCompleted();
             } else {
                 readSubject.onError(
@@ -398,11 +412,14 @@ public class GattManager implements GattManagerObserves {
 
         @DebugLog @Override
         public void onCharacteristicChanged(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic characteristic) {
+            if (writeSubject != null) {
+                writeSubject.onNext(new GattObserveData(characteristic, STATE_ON_NEXT));
+            }
             if (currentNotificationCharacteristic != null && characteristic.equals(currentNotificationCharacteristic)) {
-                notificationSubject.onNext(currentNotificationCharacteristic);
+                notificationSubject.onNext(new GattObserveData(currentNotificationCharacteristic, STATE_ON_NEXT));
             }
             if (currentIndicationCharacteristic != null && characteristic.equals(currentIndicationCharacteristic)) {
-                indicationSubject.onNext(currentIndicationCharacteristic);
+                indicationSubject.onNext(new GattObserveData(currentIndicationCharacteristic, STATE_ON_NEXT));
             }
         }
 
@@ -411,10 +428,11 @@ public class GattManager implements GattManagerObserves {
         public void onCharacteristicWrite(BluetoothGatt bluetoothGatt,
                                           BluetoothGattCharacteristic characteristic, int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                writeSubject.onNext(characteristic);
+                writeSubject.onNext(new GattObserveData(characteristic, STATE_ON_START));
             } else {
                 writeSubject.onError(
                         new WriteCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
+
             }
         }
 
@@ -433,7 +451,12 @@ public class GattManager implements GattManagerObserves {
         public void onDescriptorWrite(BluetoothGatt bluetoothGatt, BluetoothGattDescriptor descriptor, int status) {
             BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                onCharacteristicChanged(bluetoothGatt, characteristic);
+                if (currentNotificationCharacteristic != null && characteristic.equals(currentNotificationCharacteristic)) {
+                    notificationSubject.onNext(new GattObserveData(currentNotificationCharacteristic, STATE_ON_START));
+                }
+                if (currentIndicationCharacteristic != null && characteristic.equals(currentIndicationCharacteristic)) {
+                    indicationSubject.onNext(new GattObserveData(currentIndicationCharacteristic, STATE_ON_START));
+                }
             } else {
                 NotificationCharacteristicException exception = new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status);
                 if (currentNotificationCharacteristic != null && characteristic.equals(currentNotificationCharacteristic)) {
@@ -444,5 +467,44 @@ public class GattManager implements GattManagerObserves {
                 }
             }
         }
-    };
+    }
+
+    class BondDeviceBroadcastReceiver implements Observable.OnSubscribe<BluetoothDevice> {
+        private final Context context;
+        private final IntentFilter intentFilter;
+
+
+        public BondDeviceBroadcastReceiver(Context context, IntentFilter intentFilter) {
+            this.context = context;
+            this.intentFilter = intentFilter;
+        }
+
+
+        @Override
+        public void call(Subscriber<? super BluetoothDevice> subscriber) {
+            final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    switch (device.getBondState()) {
+                        case BluetoothDevice.BOND_BONDING:
+                            subscriber.onNext(device);
+                            break;
+                        case BluetoothDevice.BOND_BONDED:
+                            subscriber.onCompleted();
+                            break;
+                        case BluetoothDevice.BOND_NONE:
+                        default:
+                            subscriber.onError(new GattException("NOT BONDED"));
+                            break;
+                    }
+                }
+            };
+
+            final Subscription subscription = Subscriptions.create(() -> context.unregisterReceiver(broadcastReceiver));
+
+            subscriber.add(subscription);
+            context.registerReceiver(broadcastReceiver, intentFilter);
+        }
+    }
 }
