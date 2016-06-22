@@ -23,8 +23,14 @@ public class BluetoothHelper {
 
     public static final boolean IS_BLE_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
-    private static final int REQUEST_ENABLE_BLE = 1;
+    private static final int REQUEST_ENABLE_BLE = 1000;
     private static final int RESULT_OK = -1;
+
+
+    public static int getRequestCode() {
+        return REQUEST_ENABLE_BLE;
+    }
+
 
     private static final int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
 
@@ -47,10 +53,10 @@ public class BluetoothHelper {
 
 
     @TargetApi(Build.VERSION_CODES.M)
-    public Observable<Boolean> onRequestPermissionsResult(int requestCode, int[] grantResults) {
+    public Observable<Boolean> observeResponsePermission(int[] grantResults) {
         return Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            if (requestCode == BluetoothHelper.REQUEST_ENABLE_BLE && grantResults.length != 0) {
-                if (grantResults[0] == PERMISSION_GRANTED || grantResults[1] == PERMISSION_GRANTED) {
+            if (grantResults.length != 0) {
+                if (grantResults[0] == PERMISSION_GRANTED && grantResults[1] == PERMISSION_GRANTED) {
                     subscriber.onNext(true);
                 } else {
                     subscriber.onNext(false);
@@ -63,7 +69,7 @@ public class BluetoothHelper {
     }
 
 
-    public Action0 requestPowerAction(Activity activity) {
+    public Action0 requestPowerAction0(Activity activity) {
         return () -> requestPower(activity);
     }
 
@@ -78,9 +84,9 @@ public class BluetoothHelper {
     }
 
 
-    public Observable<Boolean> onRequestEnableResult(int requestCode, int resultCode) {
+    public Observable<Boolean> observeResponsePower(int resultCode) {
         return Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            if (requestCode == REQUEST_ENABLE_BLE && resultCode == RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 subscriber.onNext(true);
             } else {
                 subscriber.onNext(false);
