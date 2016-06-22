@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.data;
+package com.rainbow.kam.ble_gatt_manager.model;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;

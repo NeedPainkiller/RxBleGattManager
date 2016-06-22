@@ -4,8 +4,9 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.util.Log;
 
-import com.rainbow.kam.ble_gatt_manager.data.BleDevice;
+import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 
 import javax.inject.Inject;
 
@@ -49,11 +50,17 @@ public class RxBleScanner {
 
         return Observable.merge(
                 scanSubject = PublishSubject.create(),
-                Observable.create(subscriber -> {
+                Observable.create((Observable.OnSubscribe<BleDevice>) subscriber -> {
                     if (isScanAvailable() && scanner == null) {
                         scanner = bluetoothAdapter.getBluetoothLeScanner();
                     }
-                    scanner.startScan(callback);
+                    try {
+                        scanner.startScan(callback);
+                    } catch (Exception e) {
+                        Log.e("Scanner",e.getMessage());
+                    }
+
+
                 }))
                 .onBackpressureBuffer()
                 .doOnSubscribe(() -> {

@@ -8,7 +8,7 @@ publish {
     userOrg = 'kam6512'
     groupId = 'com.rainbow.library'
     artifactId = 'android-ble-gatt-manager'
-    publishVersion = '0.1.1.1'
+    publishVersion = '0.1.1.2'
     desc = 'Android BLE GATT MANAGER'
     website = 'https://github.com/kam6512/BLE-Gatt_Manager'
     issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
@@ -94,5 +94,3 @@ buildscript {
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
     }
 }
-//gradlew clean build bintrayUpload -PbintrayUser=kam6512 -PbintrayKey=4fba1f817f5c76e79438bed1d2db9bc67ce99b7e -PdryRun=false
-
