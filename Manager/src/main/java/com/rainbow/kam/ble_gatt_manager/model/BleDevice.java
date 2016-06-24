@@ -17,7 +17,7 @@ public class BleDevice implements Comparable<BleDevice> {
     private final static String UNKNOWN = BuildConfig.UNKNOWN;
 
     private final BluetoothDevice device;
-    private int rssi;
+    private final int rssi;
 
 
     private BleDevice(BluetoothDevice device, int rssi) {
@@ -75,7 +75,7 @@ public class BleDevice implements Comparable<BleDevice> {
     }
 
 
-    public CharSequence getRssiCharSequence() {
+    public String getRssiString() {
         return String.valueOf(rssi);
     }
 
