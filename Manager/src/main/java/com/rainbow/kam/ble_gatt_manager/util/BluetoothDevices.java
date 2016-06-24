@@ -43,4 +43,8 @@ public class BluetoothDevices {
         TYPE_LIST.put(2, TYPE_BLE);
         TYPE_LIST.put(3, TYPE_DUAL);
     }
+
+    @Override public String toString() {
+        return "BluetoothDevices{}";
+    }
 }

@@ -28,22 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_FLOAT;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SFLOAT;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT16;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT32;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_SINT8;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT16;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT32;
-import static android.bluetooth.BluetoothGattCharacteristic.FORMAT_UINT8;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_BROADCAST;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_EXTENDED_PROPS;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_INDICATE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_NOTIFY;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_READ;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_SIGNED_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE;
-import static android.bluetooth.BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE;
+import static android.bluetooth.BluetoothGattCharacteristic.*;
 
 public class BluetoothGatts {
 
@@ -59,70 +44,11 @@ public class BluetoothGatts {
     public final static String SERVICE_TYPE_PRIMARY = "PRIMARY";
     public final static String SERVICE_TYPE_SECONDARY = "SECONDARY";
 
-
     private final static Map<String, String> SERVICES = Maps.newHashMap();
     private final static Map<String, String> CHARACTERISTICS = Maps.newHashMap();
 
     private final static SparseArray<String> VALUE_FORMATS = new SparseArray<>();
-
     private final static LinkedHashMap<Integer, String> PROPERTIES = Maps.newLinkedHashMap();
-
-
-    public static String resolveServiceName(final String uuid) {
-        String res = SERVICES.get(uuid.toUpperCase(Locale.getDefault()));
-        return res == null ? UNKNOWN : res;
-    }
-
-
-    public static String resolveCharacteristicName(final String uuid) {
-        String res = CHARACTERISTICS.get(uuid.toUpperCase(Locale.getDefault()));
-        return res == null ? UNKNOWN : res;
-    }
-
-
-    public static String resolveServiceType(int serviceType) {
-        return (serviceType == BluetoothGattService.SERVICE_TYPE_PRIMARY) ? SERVICE_TYPE_PRIMARY : SERVICE_TYPE_SECONDARY;
-    }
-
-
-    public static String resolveValueTypeDescription(int properties) {
-        int formatListLength = VALUE_FORMATS.size();
-        for (int i = 0; i < formatListLength; i++) {
-            int format = VALUE_FORMATS.keyAt(i);
-            if ((format & properties) != 0)
-                return VALUE_FORMATS.get(format, UNKNOWN);
-        }
-        return UNKNOWN;
-    }
-
-
-    public static LinkedHashMap<Integer, String> getProperties() {
-        return PROPERTIES;
-    }
-
-
-    public static String getAvailableProperties(int properties) {
-        StringBuilder propertiesString = new StringBuilder();
-
-        propertiesString.append(String.format("0x%04X", properties));
-        for (int props : PROPERTIES.keySet()) {
-            if (isPropsAvailable(properties, props)) {
-                propertiesString.append(PROPERTIES.get(props));
-            }
-        }
-        return propertiesString.toString();
-    }
-
-
-    public static boolean isPropsAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int prop) {
-        return (bluetoothGattCharacteristic.getProperties() & prop) != 0;
-    }
-
-
-    public static boolean isPropsAvailable(int properties, int prop) {
-        return (properties & prop) != 0;
-    }
-
 
     static {
         SERVICES.put("00001811" + UUID_LABEL, "Alert Notification Service");
@@ -247,5 +173,65 @@ public class BluetoothGatts {
         PROPERTIES.put(PROPERTY_INDICATE, "INDICATE \b");
         PROPERTIES.put(PROPERTY_SIGNED_WRITE, "SIGNED WRITE \b");
         PROPERTIES.put(PROPERTY_EXTENDED_PROPS, "EXTENDED PROPS \b");
+    }
+
+    public static String resolveServiceName(final String uuid) {
+        String res = SERVICES.get(uuid.toUpperCase(Locale.getDefault()));
+        return res == null ? UNKNOWN : res;
+    }
+
+
+    public static String resolveCharacteristicName(final String uuid) {
+        String res = CHARACTERISTICS.get(uuid.toUpperCase(Locale.getDefault()));
+        return res == null ? UNKNOWN : res;
+    }
+
+
+    public static String resolveServiceType(int serviceType) {
+        return (serviceType == BluetoothGattService.SERVICE_TYPE_PRIMARY) ? SERVICE_TYPE_PRIMARY : SERVICE_TYPE_SECONDARY;
+    }
+
+
+    public static String resolveValueTypeDescription(int properties) {
+        int formatListLength = VALUE_FORMATS.size();
+        for (int i = 0; i < formatListLength; i++) {
+            int format = VALUE_FORMATS.keyAt(i);
+            if ((format & properties) != 0)
+                return VALUE_FORMATS.get(format, UNKNOWN);
+        }
+        return UNKNOWN;
+    }
+
+
+    public static LinkedHashMap<Integer, String> getProperties() {
+        return PROPERTIES;
+    }
+
+
+    public static String getAvailableProperties(int properties) {
+        StringBuilder propertiesString = new StringBuilder();
+
+        propertiesString.append(String.format("0x%04X", properties));
+        for (int props : PROPERTIES.keySet()) {
+            if (isPropsAvailable(properties, props)) {
+                propertiesString.append(PROPERTIES.get(props));
+            }
+        }
+        return propertiesString.toString();
+    }
+
+
+    public static boolean isPropsAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int prop) {
+        return (bluetoothGattCharacteristic.getProperties() & prop) != 0;
+    }
+
+
+    public static boolean isPropsAvailable(int properties, int prop) {
+        return (properties & prop) != 0;
+    }
+
+
+    @Override public String toString() {
+        return "BluetoothGatts{}";
     }
 }

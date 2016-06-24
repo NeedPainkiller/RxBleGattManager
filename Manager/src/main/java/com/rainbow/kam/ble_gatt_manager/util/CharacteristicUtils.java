@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.text.TextUtils;
 
 import com.google.common.collect.Maps;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.WriteCharacteristicException;
 
 import java.util.HashMap;
 
@@ -57,5 +57,13 @@ public class CharacteristicUtils {
                 subscriber.onError(new WriteCharacteristicException(characteristic, "value is null or empty"));
             }
         });
+    }
+
+
+    @Override public String toString() {
+        return "CharacteristicUtils{" +
+                "Observable<HashMap<String, String>> getFormattedValues(BluetoothGattCharacteristic characteristic)" +
+                "Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex)" +
+                "}";
     }
 }
