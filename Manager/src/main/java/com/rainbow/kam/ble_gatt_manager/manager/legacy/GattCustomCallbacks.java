@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.util.Log;
 
-import com.rainbow.kam.ble_gatt_manager.exceptions.GattException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
 
 /**
  * Created by kam6512 on 2015-10-29.

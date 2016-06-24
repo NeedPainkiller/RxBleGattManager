@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
-import android.content.Intent;
 
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
@@ -17,7 +16,7 @@ import rx.Observable;
 /**
  * Created by Kang Young Won on 2016-06-10.
  */
-public interface GattManagerObserves {
+public interface IGattManager {
     BluetoothGatt getGatt();
 
     BleDevice getBleDevice();
@@ -61,11 +60,12 @@ public interface GattManagerObserves {
     Observable<GattObserveData> observeNotification(final BluetoothGattCharacteristic characteristicToNotification,
                                                     final boolean enableNotification);
 
-    Observable<Boolean> isNotificationEnabled(final BluetoothGattCharacteristic characteristic);
+    Boolean isNotificationEnabled(final BluetoothGattCharacteristic characteristic);
 
-    Observable<GattObserveData> observeIndication(final UUID uuidToIndication, boolean enableIndication);
+    Observable<GattObserveData> observeIndication(final UUID uuidToIndication);
 
 
-    Observable<GattObserveData> observeIndication(final BluetoothGattCharacteristic characteristicToIndication,
-                                                  boolean enableIndication);
+    Observable<GattObserveData> observeIndication(final BluetoothGattCharacteristic characteristicToIndication);
+
+    Boolean isIndicationEnabled(final BluetoothGattCharacteristic characteristic);
 }

@@ -18,13 +18,13 @@ import android.util.Log;
 
 import com.google.common.primitives.Bytes;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.ConnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.DisconnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.GattResourceNotDiscoveredException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.NotificationCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.ReadCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.RssiMissException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.ConnectedFailException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.DisconnectedFailException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.GattResourceNotDiscoveredException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.NotificationCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.ReadCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.RssiMissException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.WriteCharacteristicException;
 
 import java.util.List;
 import java.util.UUID;
