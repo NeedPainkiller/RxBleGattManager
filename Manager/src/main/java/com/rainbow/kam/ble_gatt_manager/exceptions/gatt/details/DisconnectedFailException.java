@@ -1,6 +1,6 @@
-package com.rainbow.kam.ble_gatt_manager.exceptions.details;
+package com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details;
 
-import com.rainbow.kam.ble_gatt_manager.exceptions.GattException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
 
 /**
  * Created by Kang Young Won on 2016-05-12.

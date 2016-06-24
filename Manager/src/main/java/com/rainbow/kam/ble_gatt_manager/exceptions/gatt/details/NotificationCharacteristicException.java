@@ -1,9 +1,9 @@
-package com.rainbow.kam.ble_gatt_manager.exceptions.details;
+package com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 
-import com.rainbow.kam.ble_gatt_manager.exceptions.GattException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
 
 import java.util.UUID;
 
