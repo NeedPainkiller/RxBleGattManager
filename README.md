@@ -150,7 +150,7 @@ gattManager.observeIndication(characteristic)
 ### Gradle
 
 ```java
-compile 'com.rainbow.library:android-ble-gatt-manager:0.1.2.1'
+compile 'com.rainbow.library:android-ble-gatt-manager:0.1.2.2'
 ```
 ### Maven
 
@@ -158,13 +158,13 @@ compile 'com.rainbow.library:android-ble-gatt-manager:0.1.2.1'
 <dependency>
   <groupId>com.rainbow.library</groupId>
   <artifactId>android-ble-gatt-manager</artifactId>
-  <version>0.1.2.1</version>
+  <version>0.1.2.2</version>
   <type>pom</type>
 </dependency>
 ```
 ### Ivy
 ```xml
-<dependency org='com.rainbow.library' name='android-ble-gatt-manager' rev='0.1.2.1'>
+<dependency org='com.rainbow.library' name='android-ble-gatt-manager' rev='0.1.2.2'>
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
