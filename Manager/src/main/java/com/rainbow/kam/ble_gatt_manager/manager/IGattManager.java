@@ -33,15 +33,15 @@ public interface IGattManager {
 
     Observable<BluetoothDevice> observeBond();
 
-    Observable<Integer> observeRssi();
+    Observable<Integer> observeRssi(long rssiUpdateTimeInterval);
 
     Observable<List<BluetoothGattService>> observeDiscoverService();
 
-    Observable<GattObserveData> observeBattery();
+    Observable<BluetoothGattCharacteristic> observeBattery();
 
-    Observable<GattObserveData> observeRead(final UUID uuidToRead);
+    Observable<BluetoothGattCharacteristic> observeRead(final UUID uuidToRead);
 
-    Observable<GattObserveData> observeRead(final BluetoothGattCharacteristic characteristicToRead);
+    Observable<BluetoothGattCharacteristic> observeRead(final BluetoothGattCharacteristic characteristicToRead);
 
     Observable<GattObserveData> observeWrite(final UUID uuidToWrite, final List<Byte> valuesToWrite);
 
