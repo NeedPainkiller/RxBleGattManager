@@ -165,7 +165,7 @@ public class GattManagerLegacy {
                     bluetoothGatt.writeDescriptor(notificationDescriptor);
                     gattCustomCallbacks.onSetNotificationSuccess();
                 }, throwable -> {
-                    gattCustomCallbacks.onError(new NotificationCharacteristicException(notificationDescriptor.getCharacteristic(), notificationDescriptor, throwable.getMessage()));
+                    gattCustomCallbacks.onError(new NotificationCharacteristicException(notificationDescriptor, throwable.getMessage()));
                 })
                 .unsubscribe();
     }
@@ -340,7 +340,7 @@ public class GattManagerLegacy {
                 }
 
             } else {
-                gattCustomCallbacks.onError(new NotificationCharacteristicException(descriptor.getCharacteristic(), descriptor, "DescriptorWrite FAIL", status));
+                gattCustomCallbacks.onError(new NotificationCharacteristicException(descriptor, "DescriptorWrite FAIL", status));
             }
         }
     };

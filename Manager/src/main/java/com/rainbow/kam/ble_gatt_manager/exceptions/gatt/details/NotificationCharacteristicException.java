@@ -17,16 +17,16 @@ public class NotificationCharacteristicException extends GattException {
     private final int status;
 
 
-    public NotificationCharacteristicException(BluetoothGattCharacteristic characteristic, BluetoothGattDescriptor descriptor, String subMessage) {
-        this(characteristic, descriptor, subMessage, STATUS_UNKNOWN);
+    public NotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage) {
+        this(descriptor, subMessage, STATUS_UNKNOWN);
     }
 
 
-    public NotificationCharacteristicException(BluetoothGattCharacteristic characteristic, BluetoothGattDescriptor descriptor, String subMessage, int status) {
+    public NotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage, int status) {
         super(subMessage);
-        this.characteristic = characteristic;
-        this.UUID = characteristic.getUuid();
         this.descriptor = descriptor;
+        this.characteristic = descriptor.getCharacteristic();
+        this.UUID = characteristic.getUuid();
         this.status = status;
     }
 
