@@ -1,7 +1,6 @@
-<manifest
-    package="com.rainbow.kam.ble_gatt_manager"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    >
+<manifest package="com.rainbow.kam.ble_gatt_manager"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>

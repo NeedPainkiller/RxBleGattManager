@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.br;
+package com.rainbow.kam.ble_gatt_manager.broadcast;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
