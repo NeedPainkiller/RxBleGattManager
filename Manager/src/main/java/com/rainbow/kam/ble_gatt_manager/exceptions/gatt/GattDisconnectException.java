@@ -1,28 +1,26 @@
-package com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details;
-
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
+package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
-public class DisconnectedFailException extends GattException {
+public class GattDisconnectException extends GattException {
     private final String macAddress;
 
 
-    public DisconnectedFailException(String macAddress, String subMessage) {
+    public GattDisconnectException(String macAddress, String subMessage) {
         super(subMessage);
         this.macAddress = macAddress;
     }
 
 
-    public DisconnectedFailException(String subMessage) {
+    public GattDisconnectException(String subMessage) {
         super(subMessage);
         this.macAddress = "?";
     }
 
 
     @Override public String toString() {
-        return "DisconnectedFailException{ " +
+        return "GattDisconnectException{ " +
                 "macAddress -> '" + macAddress + '\'' +
                 "subMessage -> '" + getMessage() + '\'' +
                 '}';

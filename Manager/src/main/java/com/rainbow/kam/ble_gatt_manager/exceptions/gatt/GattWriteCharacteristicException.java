@@ -1,26 +1,27 @@
-package com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details;
+package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
 import android.bluetooth.BluetoothGattCharacteristic;
-
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
 
 import java.util.UUID;
 
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
-public class WriteCharacteristicException extends GattException {
+public class GattWriteCharacteristicException extends GattException {
+
+    public static final String NULL_OR_EMPTY_DATA = "data is Null or Empty";
+
     private final BluetoothGattCharacteristic characteristic;
     private final UUID UUID;
     private final int state;
 
 
-    public WriteCharacteristicException(BluetoothGattCharacteristic characteristic, String subMessage) {
-        this(characteristic, subMessage, STATUS_UNKNOWN);
+    public GattWriteCharacteristicException(BluetoothGattCharacteristic characteristic, String subMessage) {
+        this(characteristic, subMessage, STATE_UNKNOWN);
     }
 
 
-    public WriteCharacteristicException(BluetoothGattCharacteristic characteristic, String subMessage, int state) {
+    public GattWriteCharacteristicException(BluetoothGattCharacteristic characteristic, String subMessage, int state) {
         super(subMessage);
         this.characteristic = characteristic;
         this.UUID = characteristic.getUuid();
@@ -29,7 +30,7 @@ public class WriteCharacteristicException extends GattException {
 
 
     @Override public String toString() {
-        return "WriteCharacteristicException{" +
+        return "GattWriteCharacteristicException{" +
                 "characteristic=" + characteristic +
                 ", UUID=" + UUID +
                 ", subMessage=" + getMessage() +

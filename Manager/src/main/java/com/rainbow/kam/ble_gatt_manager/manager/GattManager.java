@@ -8,8 +8,7 @@ import android.content.IntentFilter;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Bytes;
 import com.rainbow.kam.ble_gatt_manager.broadcast.BondDeviceBroadcastReceiver;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.*;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.*;
 import com.rainbow.kam.ble_gatt_manager.model.*;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
 
@@ -24,6 +23,10 @@ import rx.Subscription;
 import rx.subjects.PublishSubject;
 
 import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationCharacteristicException.*;
 
 /**
  * Created by kam6512 on 2015-10-29.
@@ -51,12 +54,12 @@ public class GattManager implements IGattManager {
     private BluetoothGattCharacteristic currentNotificationCharacteristic;
     private BluetoothGattCharacteristic currentIndicationCharacteristic;
 
-    private static final GattResourceNotDiscoveredException UUID_CHARACTERLESS;
-    private static final GattException GATT_NOT_CONNECTED;
+    private static final GattResourceNotDiscoveredException UUID_NOT_FOUND;
+    private static final GattConnectException GATT_NOT_CONNECTED;
 
     static {
-        UUID_CHARACTERLESS = new GattResourceNotDiscoveredException("CHECK UUID / CHARACTERISTIC");
-        GATT_NOT_CONNECTED = new GattException("if Ble Device not connected, you can not observe any operations");
+        UUID_NOT_FOUND = new GattResourceNotDiscoveredException(NONE_UUID_CHARACTERISTIC);
+        GATT_NOT_CONNECTED = new GattConnectException(NOT_CONNECTED);
     }
 
     @Inject public GattManager(final Application application) {
@@ -83,22 +86,22 @@ public class GattManager implements IGattManager {
         return Observable.merge(connectionSubject = PublishSubject.create(),
                 Observable.create(subscriber -> {
                     if (app == null) {
-                        subscriber.onError(new GattException("Application is not available"));
+                        subscriber.onError(new GattConnectException(NONE_APPLICATION));
                     }
 
                     device = bleDevice;
                     if (device == null) {
-                        subscriber.onError(new GattException("BleDevice is not available"));
+                        subscriber.onError(new GattConnectException(NONE_BLE_DEVICE));
                     }
 
                     String deviceAddress = device.getAddress();
                     if (Strings.isNullOrEmpty(deviceAddress)) {
-                        subscriber.onError(new GattException("Address is not available"));
+                        subscriber.onError(new GattConnectException(NONE_ADDRESS));
                     }
 
                     setBluetooth();
                     if (!bluetoothAdapter.isEnabled()) {
-                        subscriber.onError(new ConnectedFailException(deviceAddress, "Adapter is not available or disabled"));
+                        subscriber.onError(new GattConnectException(deviceAddress, NONE_BT));
                     }
 
                     if (isConnected()) {
@@ -131,7 +134,7 @@ public class GattManager implements IGattManager {
                 closeGatt();
             }
         } else {
-            connectionSubject.onError(new DisconnectedFailException(device.getAddress(), "Gatt / Adapter is not available or disabled"));
+            connectionSubject.onError(new GattDisconnectException(device.getAddress(), NONE_BT));
         }
     }
 
@@ -144,7 +147,7 @@ public class GattManager implements IGattManager {
 
 
     @Override public Observable<BluetoothDevice> observeBond()
-            throws GattException {
+            throws GattConnectException {
         if (isConnected()) {
             final IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
             final BondDeviceBroadcastReceiver receiver = new BondDeviceBroadcastReceiver(app, filter);
@@ -203,7 +206,7 @@ public class GattManager implements IGattManager {
                         if (characteristicToRead != null) {
                             bluetoothGatt.readCharacteristic(characteristicToRead);
                         } else {
-                            subscriber.onError(UUID_CHARACTERLESS);
+                            subscriber.onError(UUID_NOT_FOUND);
                         }
                     } else {
                         subscriber.onError(GATT_NOT_CONNECTED);
@@ -236,13 +239,13 @@ public class GattManager implements IGattManager {
                 Observable.create((Observable.OnSubscribe<GattObserveData>) subscriber -> {
                     if (isConnected()) {
                         if (valuesToWrite == null || valuesToWrite.length == 0) {
-                            subscriber.onError(new WriteCharacteristicException(characteristicToWrite, "data is Null or Empty"));
+                            subscriber.onError(new GattWriteCharacteristicException(characteristicToWrite, NULL_OR_EMPTY_DATA));
                         }
                         if (characteristicToWrite != null) {
                             characteristicToWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
                             characteristicToWrite.setValue(valuesToWrite);
                         } else {
-                            subscriber.onError(UUID_CHARACTERLESS);
+                            subscriber.onError(UUID_NOT_FOUND);
                         }
                         bluetoothGatt.writeCharacteristic(currentWriteCharacteristic);
                     } else {
@@ -270,7 +273,7 @@ public class GattManager implements IGattManager {
                             notificationDescriptor.setValue(value);
                             bluetoothGatt.writeDescriptor(notificationDescriptor);
                         } else {
-                            subscriber.onError(UUID_CHARACTERLESS);
+                            subscriber.onError(UUID_NOT_FOUND);
                         }
                     } else {
                         subscriber.onError(GATT_NOT_CONNECTED);
@@ -312,7 +315,7 @@ public class GattManager implements IGattManager {
                             indicationDescriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
                             bluetoothGatt.writeDescriptor(indicationDescriptor);
                         } else {
-                            subscriber.onError(UUID_CHARACTERLESS);
+                            subscriber.onError(UUID_NOT_FOUND);
                         }
                     } else {
                         subscriber.onError(GATT_NOT_CONNECTED);
@@ -389,7 +392,7 @@ public class GattManager implements IGattManager {
             if (isGattStatusSuccess(status)) {
                 rssiSubject.onNext(rssi);
             } else {
-                rssiSubject.onError(new RssiMissException(status));
+                rssiSubject.onError(new GattRssiException(status));
             }
         }
 
@@ -400,7 +403,7 @@ public class GattManager implements IGattManager {
                 serviceSubject.onNext(bluetoothGatt.getServices());
                 serviceSubject.onCompleted();
             } else {
-                serviceSubject.onError(new GattResourceNotDiscoveredException("ServicesDiscovered FAIL"));
+                serviceSubject.onError(new GattResourceNotDiscoveredException(NONE_SERVICES));
             }
         }
 
@@ -411,8 +414,8 @@ public class GattManager implements IGattManager {
                 readSubject.onNext(characteristic);
                 readSubject.onCompleted();
             } else {
-                readSubject.onError(new ReadCharacteristicException(
-                        characteristic, "Check Gatt Service Available or Connection!", status));
+                readSubject.onError(new GattReadCharacteristicException(
+                        characteristic, STATUS_RESULT_FAIL, status));
             }
         }
 
@@ -423,7 +426,7 @@ public class GattManager implements IGattManager {
                 writeSubject.onNext(new GattObserveData(characteristic, STATE_ON_START));
             } else {
                 writeSubject.onError(
-                        new WriteCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
+                        new GattWriteCharacteristicException(characteristic, STATUS_RESULT_FAIL, status));
             }
         }
 
@@ -442,8 +445,9 @@ public class GattManager implements IGattManager {
         }
 
 
-        @Override public void onDescriptorWrite(
-                final BluetoothGatt bluetoothGatt, final BluetoothGattDescriptor descriptor, final int status) {
+        @Override
+        public void onDescriptorWrite(final BluetoothGatt bluetoothGatt,
+                                      final BluetoothGattDescriptor descriptor, final int status) {
             BluetoothGattCharacteristic characteristic = descriptor.getCharacteristic();
             if (isGattStatusSuccess(status)) {
                 if (isCharacteristicAvailable(characteristic, currentNotificationCharacteristic)) {
@@ -453,8 +457,8 @@ public class GattManager implements IGattManager {
                     indicationSubject.onNext(new GattObserveData(currentIndicationCharacteristic, STATE_ON_START));
                 }
             } else {
-                NotificationCharacteristicException exception = new NotificationCharacteristicException(
-                        descriptor, "DescriptorWrite FAIL", status);
+                GattNotificationCharacteristicException exception = new GattNotificationCharacteristicException(
+                        descriptor, DESCRIPTION_WRITE_FAIL, status);
                 if (isCharacteristicAvailable(characteristic, currentNotificationCharacteristic)) {
                     notificationSubject.onError(exception);
                 }

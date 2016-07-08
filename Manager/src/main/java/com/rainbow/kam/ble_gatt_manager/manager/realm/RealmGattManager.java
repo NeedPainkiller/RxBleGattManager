@@ -27,9 +27,9 @@ import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.*;
  * Created by Kang Young Won on 2016-06-30.
  */
 public class RealmGattManager extends GattManager {
-    RealmHelper realmHelper;
+    private final RealmHelper realmHelper;
 
-    GattRecodeModel gattRecodeModel = new GattRecodeModel();
+    private final GattRecodeModel gattRecodeModel = new GattRecodeModel();
 
 
     @Inject public RealmGattManager(Application application) {
@@ -256,7 +256,8 @@ public class RealmGattManager extends GattManager {
         return super.getBleDevice();
     }
 
-    public void showRecode(){
+
+    public void showRecode() {
         realmHelper.readRecodedGatt();
     }
 }

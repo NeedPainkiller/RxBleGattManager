@@ -1,28 +1,29 @@
-package com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details;
+package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
 
 import java.util.UUID;
 
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
-public class NotificationCharacteristicException extends GattException {
+public class GattNotificationCharacteristicException extends GattException {
+
+    public static final String DESCRIPTION_WRITE_FAIL = "DescriptorWrite FAIL";
+
     private final BluetoothGattCharacteristic characteristic;
     private final UUID UUID;
     private final BluetoothGattDescriptor descriptor;
     private final int status;
 
 
-    public NotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage) {
-        this(descriptor, subMessage, STATUS_UNKNOWN);
+    public GattNotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage) {
+        this(descriptor, subMessage, STATE_UNKNOWN);
     }
 
 
-    public NotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage, int status) {
+    public GattNotificationCharacteristicException(BluetoothGattDescriptor descriptor, String subMessage, int status) {
         super(subMessage);
         this.descriptor = descriptor;
         this.characteristic = descriptor.getCharacteristic();
@@ -32,7 +33,7 @@ public class NotificationCharacteristicException extends GattException {
 
 
     @Override public String toString() {
-        return "NotificationCharacteristicException{" +
+        return "GattNotificationCharacteristicException{" +
                 ", UUID=" + UUID +
                 ", descriptor=" + descriptor +
                 ", subMessage=" + getMessage() +

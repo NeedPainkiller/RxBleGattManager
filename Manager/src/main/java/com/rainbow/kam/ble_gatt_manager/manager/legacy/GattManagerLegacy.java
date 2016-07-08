@@ -17,14 +17,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.common.primitives.Bytes;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattDisconnectException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattReadCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.ConnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.DisconnectedFailException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.GattResourceNotDiscoveredException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.NotificationCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.ReadCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.RssiMissException;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattRssiException;
 
 import java.util.List;
 import java.util.UUID;
@@ -86,7 +86,7 @@ public class GattManagerLegacy {
 
     public void connect(final String deviceAddress) {
         if (TextUtils.isEmpty(deviceAddress)) {
-            gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "Address is not available"));
+            gattCustomCallbacks.onError(new GattConnectException(deviceAddress, "Address is not available"));
             return;
         }
         if (bluetoothGatt != null && bluetoothGatt.getDevice().getAddress().equals(deviceAddress)) {
@@ -94,7 +94,7 @@ public class GattManagerLegacy {
         } else {
             bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress);
             if (bluetoothDevice == null) {
-                gattCustomCallbacks.onError(new ConnectedFailException(deviceAddress, "RemoteDevice is not available"));
+                gattCustomCallbacks.onError(new GattConnectException(deviceAddress, "RemoteDevice is not available"));
             } else {
                 bluetoothGatt = bluetoothDevice.connectGatt(application, false, bluetoothGattCallback);
             }
@@ -108,10 +108,10 @@ public class GattManagerLegacy {
             if (isConnected() || isBluetoothAvailable()) {
                 bluetoothGatt.disconnect();
             } else {
-                gattCustomCallbacks.onError(new DisconnectedFailException(deviceAddress, "Device already Disconnected"));
+                gattCustomCallbacks.onError(new GattDisconnectException(deviceAddress, "Device already Disconnected"));
             }
         } else {
-            gattCustomCallbacks.onError(new DisconnectedFailException(deviceAddress, "BluetoothGatt is not Available"));
+            gattCustomCallbacks.onError(new GattDisconnectException(deviceAddress, "BluetoothGatt is not Available"));
         }
     }
 
@@ -165,7 +165,7 @@ public class GattManagerLegacy {
                     bluetoothGatt.writeDescriptor(notificationDescriptor);
                     gattCustomCallbacks.onSetNotificationSuccess();
                 }, throwable -> {
-                    gattCustomCallbacks.onError(new NotificationCharacteristicException(notificationDescriptor, throwable.getMessage()));
+                    gattCustomCallbacks.onError(new GattNotificationCharacteristicException(notificationDescriptor, throwable.getMessage()));
                 })
                 .unsubscribe();
     }
@@ -213,7 +213,7 @@ public class GattManagerLegacy {
                 .subscribe(characteristic -> {
                     bluetoothGatt.writeCharacteristic(bluetoothGattCharacteristic);
                 }, throwable -> {
-                    gattCustomCallbacks.onError(new WriteCharacteristicException(writeCharacteristic, throwable.getMessage()));
+                    gattCustomCallbacks.onError(new GattWriteCharacteristicException(writeCharacteristic, throwable.getMessage()));
                 })
                 .unsubscribe();
     }
@@ -293,7 +293,7 @@ public class GattManagerLegacy {
                 gattCustomCallbacks.onReadSuccess(characteristic);
                 Log.i(TAG, "CharacteristicRead SUCCESS " + characteristic.getUuid().toString());
             } else {
-                gattCustomCallbacks.onError(new ReadCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
+                gattCustomCallbacks.onError(new GattReadCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
                 Log.i(TAG, "CharacteristicRead FAIL " + characteristic.getUuid().toString());
             }
         }
@@ -311,7 +311,7 @@ public class GattManagerLegacy {
                 gattCustomCallbacks.onWriteSuccess();
                 Log.i(TAG, "CharacteristicWrite SUCCESS " + characteristic.getUuid().toString());
             } else {
-                gattCustomCallbacks.onError(new WriteCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
+                gattCustomCallbacks.onError(new GattWriteCharacteristicException(characteristic, "Check Gatt Service Available or Device Connection!", status));
                 Log.i(TAG, "CharacteristicWrite FAIL " + characteristic.getUuid().toString());
             }
         }
@@ -322,7 +322,7 @@ public class GattManagerLegacy {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 gattCustomCallbacks.onRSSIUpdate(rssi);
             } else {
-                gattCustomCallbacks.onError(new RssiMissException(status));
+                gattCustomCallbacks.onError(new GattRssiException(status));
             }
         }
 
@@ -340,7 +340,7 @@ public class GattManagerLegacy {
                 }
 
             } else {
-                gattCustomCallbacks.onError(new NotificationCharacteristicException(descriptor, "DescriptorWrite FAIL", status));
+                gattCustomCallbacks.onError(new GattNotificationCharacteristicException(descriptor, "DescriptorWrite FAIL", status));
             }
         }
     };
