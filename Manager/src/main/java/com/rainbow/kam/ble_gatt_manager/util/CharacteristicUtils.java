@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.text.TextUtils;
 
 import com.google.common.collect.Maps;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.details.WriteCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
 
 import java.util.HashMap;
 
@@ -54,7 +54,7 @@ public class CharacteristicUtils {
                 }
                 subscriber.onNext(bytes);
             } else {
-                subscriber.onError(new WriteCharacteristicException(characteristic, "value is null or empty"));
+                subscriber.onError(new GattWriteCharacteristicException(characteristic, "value is null or empty"));
             }
         });
     }

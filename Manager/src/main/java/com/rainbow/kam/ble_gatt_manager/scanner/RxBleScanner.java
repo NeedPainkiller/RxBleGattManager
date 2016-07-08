@@ -80,5 +80,4 @@ public class RxBleScanner implements IRxBleScanner {
             scanner.stopScan(callback);
         }
     }
-
 }

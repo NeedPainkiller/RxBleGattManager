@@ -12,6 +12,8 @@ import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.functions.Action0;
 
@@ -23,19 +25,17 @@ public class BluetoothHelper {
 
     public static final boolean IS_BLE_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
 
-    private static final int REQUEST_ENABLE_BLE = 1000;
-    private static final int RESULT_OK = -1;
-
-
-    public static int getRequestCode() {
-        return REQUEST_ENABLE_BLE;
-    }
-
+    public static final int REQUEST_ENABLE_BLE = 1000;
+    public static final int RESULT_OK = -1;
 
     private static final int PERMISSION_GRANTED = PackageManager.PERMISSION_GRANTED;
 
     private static final String PERMISSION_COARSE = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final String PERMISSION_FINE = Manifest.permission.ACCESS_FINE_LOCATION;
+
+
+    @Inject public BluetoothHelper() {
+    }
 
 
     public Action0 requestPermissionAction0(Activity activity) {
