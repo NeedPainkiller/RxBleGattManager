@@ -1,25 +1,16 @@
 apply plugin: 'com.android.library'
-
-//  Hugo
 apply plugin: 'com.jakewharton.hugo'
-
-//  Retrolambda (Java 1.8)
 apply plugin: 'me.tatarka.retrolambda'
-
-//  APT
 apply plugin: 'com.neenbedankt.android-apt'
-
-//  Realm Java
 apply plugin: 'realm-android'
 
-//  Gradle Bintray
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
     userOrg = 'kam6512'
     groupId = 'com.rainbow.library'
     artifactId = 'android-ble-gatt-manager'
-    publishVersion = '0.1.2.3'
+    publishVersion = '0.1.3.1'
     desc = 'Android BLE GATT MANAGER'
     website = 'https://github.com/kam6512/BLE-Gatt_Manager'
     issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
@@ -55,37 +46,37 @@ android {
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:support-v4:24.0.0'
-    compile 'com.android.support:support-annotations:24.0.0'
-    compile 'com.google.guava:guava:19.0'
 
-    //  Guava
-    compile 'com.google.guava:guava:19.0'
+    Map<String, String> dependencies = rootProject.ext.dependencies;
 
-    // RxJava
-    compile 'io.reactivex:rxandroid:1.2.0'
-    compile 'io.reactivex:rxjava:1.1.5'
+    testCompile dependencies.JUnit
+    compile dependencies.FileTree
 
-    // Lombok
-    provided "org.projectlombok:lombok:1.12.6"
-    apt "org.projectlombok:lombok:1.12.6"
+    compile dependencies.Stetho
+    compile dependencies.StethoOkHttp
 
-    // Dagger
-    compile 'com.google.dagger:dagger:2.2'
-    apt 'com.google.dagger:dagger-compiler:2.2'
+    compile dependencies.Google_SupportV4
+    compile dependencies.Google_AppCompatV7
+    compile dependencies.Google_Design
+    compile dependencies.Google_CardView
+    compile dependencies.Google_RecyclerView
+    compile dependencies.Google_Annotations
 
-    //  jsr310
-    compile 'com.jakewharton.threetenabp:threetenabp:1.0.3'
+    compile dependencies.Guava
 
-    // Stetho
-    compile 'com.facebook.stetho:stetho:1.3.1'
-    compile 'com.facebook.stetho:stetho-okhttp3:1.3.1'
+    compile dependencies.RxJava
+    compile dependencies.RxAndroid
+
+    compile dependencies.dagger
+    apt dependencies.daggerCompilerApt
+    compile dependencies.jsr310
+
 }
 repositories {
     maven { url "https://jitpack.io" }
@@ -95,23 +86,15 @@ repositories {
 buildscript {
     repositories {
         mavenLocal()
-        jcenter()
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
-
-        //  Hugo
         classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
-
-        //  Retrolambda (Java 1.8)
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-
-        //  APT
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-
-        //  Realm Java
         classpath "io.realm:realm-gradle-plugin:1.0.1"
     }
 }

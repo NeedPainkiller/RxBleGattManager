@@ -1,0 +1,51 @@
+ext {
+    supportLibraryVersion = '24.0.0'
+
+    RxLifeCycleVersion = '0.6.1'
+    DaggerVersion = '2.5'
+    ButterKnifeVersion = '8.1.0'
+    AndroidAnnotationsVersion = '4.0.0'
+    StethoVersion = '1.3.1'
+
+    dependencies = [
+            gradle                : 'com.android.tools.build:gradle:2.1.4',
+            FileTree              : fileTree(dir: 'libs', include: ['*.jar']),
+            JUnit                 : "junit:junit:4.12",
+
+            Hugo                  : "com.jakewharton.hugo:hugo-plugin:1.2.1",
+            Retrolambda           : "me.tatarka:gradle-retrolambda:3.2.5",
+            APT                   : "com.neenbedankt.gradle.plugins:android-apt:1.8",
+            RealmJava             : "io.realm:realm-gradle-plugin:1.0.1",
+
+            Google_SupportV4      : "com.android.support:support-v4:$supportLibraryVersion",
+            Google_AppCompatV7    : "com.android.support:appcompat-v7:$supportLibraryVersion",
+            Google_Design         : "com.android.support:design:$supportLibraryVersion",
+            Google_CardView       : "com.android.support:cardview-v7:$supportLibraryVersion",
+            Google_RecyclerView   : "com.android.support:recyclerview-v7:$supportLibraryVersion",
+            Google_Annotations    : "com.android.support:support-annotations:$supportLibraryVersion",
+
+            Guava                 : "com.google.guava:guava:19.0",
+
+            RxAndroid             : "io.reactivex:rxandroid:1.2.1",
+            RxJava                : "io.reactivex:rxjava:1.1.6",
+            Rxlifecycle           : "com.trello:rxlifecycle:$RxLifeCycleVersion",
+            RxlifecycleComponent  : "com.trello:rxlifecycle-components:$RxLifeCycleVersion",
+
+            dagger                : "com.google.dagger:dagger:$DaggerVersion",
+            daggerCompilerApt     : "com.google.dagger:dagger-compiler:$DaggerVersion",
+            jsr310                : 'com.jakewharton.threetenabp:threetenabp:1.0.3',
+
+            ButterKnife           : "com.jakewharton:butterknife:$ButterKnifeVersion",
+            ButterKnifeCompilerApt: "com.jakewharton:butterknife-compiler:$ButterKnifeVersion",
+
+            AndroidAnnotations    : "org.androidannotations:androidannotations-api:$AndroidAnnotationsVersion",
+            AndroidAnnotationsApt : "org.androidannotations:androidannotations:$AndroidAnnotationsVersion",
+
+            MaterialDialogs       : 'com.github.afollestad.material-dialogs:commons:0.8.6.1@aar',
+
+            GattManager           : 'com.rainbow.library:android-ble-gatt-manager:0.1.2.3',
+
+            Stetho                : "com.facebook.stetho:stetho:$StethoVersion",
+            StethoOkHttp          : "com.facebook.stetho:stetho-okhttp3:$StethoVersion",
+    ]
+}
