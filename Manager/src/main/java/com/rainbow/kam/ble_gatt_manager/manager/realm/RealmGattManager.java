@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 
 import com.google.common.primitives.Bytes;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
 import com.rainbow.kam.ble_gatt_manager.helper.RealmHelper;
 import com.rainbow.kam.ble_gatt_manager.manager.GattManager;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
@@ -73,7 +74,7 @@ public class RealmGattManager extends GattManager {
     }
 
 
-    @Override public Observable<BluetoothDevice> observeBond() {
+    @Override public Observable<BluetoothDevice> observeBond()  throws GattConnectException {
         return super.observeBond()
                 .doOnSubscribe(() -> {
                     gattRecodeModel.setGattOperationUUID(UUID_NONE);

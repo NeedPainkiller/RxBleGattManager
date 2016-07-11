@@ -10,7 +10,7 @@ publish {
     userOrg = 'kam6512'
     groupId = 'com.rainbow.library'
     artifactId = 'android-ble-gatt-manager'
-    publishVersion = '0.1.3.2'
+    publishVersion = '0.1.3.3'
     desc = 'Android BLE GATT MANAGER'
     website = 'https://github.com/kam6512/BLE-Gatt_Manager'
     issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
@@ -77,6 +77,9 @@ dependencies {
     apt dependencies.daggerCompilerApt
     compile dependencies.jsr310
 
+    compile(dependencies.MaterialDialogs) {
+        transitive = true
+    }
 }
 repositories {
     maven { url "https://jitpack.io" }

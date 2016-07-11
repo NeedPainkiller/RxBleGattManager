@@ -9,4 +9,8 @@
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="true"/>
+    <application>
+        <activity android:name=".permission.PermissionActivity"
+            android:theme="@style/AppTheme"/>
+    </application>
 </manifest>

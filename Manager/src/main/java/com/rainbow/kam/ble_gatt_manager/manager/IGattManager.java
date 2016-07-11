@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
 
@@ -31,7 +32,7 @@ public interface IGattManager {
 
     BluetoothGattCharacteristic findCharacteristic(final UUID uuid);
 
-    Observable<BluetoothDevice> observeBond();
+    Observable<BluetoothDevice> observeBond() throws GattConnectException;
 
     Observable<Integer> observeRssi(long rssiUpdateTimeInterval);
 
