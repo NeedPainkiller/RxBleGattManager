@@ -3,7 +3,7 @@ package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
-public class GattException extends RuntimeException {
+public class GattException extends Throwable {
     public static final int STATE_UNKNOWN = 9999;
     public static final String STATUS_RESULT_FAIL = "Check Gatt Service Available or Connection!";
     public static final String UNKNOWN = "UNKNOWN";
