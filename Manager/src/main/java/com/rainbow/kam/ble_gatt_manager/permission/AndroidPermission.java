@@ -1,6 +1,6 @@
 package com.rainbow.kam.ble_gatt_manager.permission;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -19,7 +19,7 @@ import rx.subjects.PublishSubject;
 
 public class AndroidPermission {
 
-    private Context context;
+    private Activity activity;
 
     protected static String packageName;
     protected static String[] permissions;
@@ -32,14 +32,14 @@ public class AndroidPermission {
     protected static PublishSubject<ArrayList<String>> permissionSubject = PublishSubject.create();
 
 
-    public AndroidPermission(Context context) {
-        packageName = context.getPackageName();
-        explanationMessage = context.getString(R.string.permission_default_message_explanation);
-        denyMessage = context.getString(R.string.permission_default_message_denied);
-        settingButtonText = context.getString(R.string.permission_default_setting);
-        deniedCloseButtonText = context.getString(R.string.permission_default_denied_close);
-        explanationConfirmText = context.getString(R.string.permission_default_confirm);
-        this.context = context;
+    public AndroidPermission(Activity activity) {
+        packageName = activity.getPackageName();
+        explanationMessage = activity.getString(R.string.permission_default_message_explanation);
+        denyMessage = activity.getString(R.string.permission_default_message_denied);
+        settingButtonText = activity.getString(R.string.permission_default_setting);
+        deniedCloseButtonText = activity.getString(R.string.permission_default_denied_close);
+        explanationConfirmText = activity.getString(R.string.permission_default_confirm);
+        this.activity = activity;
     }
 
 
@@ -59,7 +59,7 @@ public class AndroidPermission {
         if (stringRes <= 0) {
             throw new IllegalArgumentException("Invalid value for explanationMessage");
         }
-        explanationMessage = this.context.getString(stringRes);
+        explanationMessage = this.activity.getString(stringRes);
         return this;
     }
 
@@ -74,7 +74,7 @@ public class AndroidPermission {
         if (stringRes <= 0) {
             throw new IllegalArgumentException("Invalid value for DeniedMessage");
         }
-        denyMessage = context.getString(stringRes);
+        denyMessage = activity.getString(stringRes);
         return this;
     }
 
@@ -89,7 +89,7 @@ public class AndroidPermission {
         if (stringRes <= 0) {
             throw new IllegalArgumentException("Invalid value for setGotoSettingButtonText");
         }
-        settingButtonText = context.getString(stringRes);
+        settingButtonText = activity.getString(stringRes);
         return this;
     }
 
@@ -104,7 +104,7 @@ public class AndroidPermission {
         if (stringRes <= 0) {
             throw new IllegalArgumentException("Invalid value for explanationConfirmText");
         }
-        explanationConfirmText = context.getString(stringRes);
+        explanationConfirmText = activity.getString(stringRes);
         return this;
     }
 
@@ -119,7 +119,7 @@ public class AndroidPermission {
         if (stringRes <= 0) {
             throw new IllegalArgumentException("Invalid value for DeniedCloseButtonText");
         }
-        deniedCloseButtonText = context.getString(stringRes);
+        deniedCloseButtonText = activity.getString(stringRes);
         return this;
     }
 
@@ -132,7 +132,7 @@ public class AndroidPermission {
             } else {
                 boolean isGrantedAll = true;
                 for (String permission : AndroidPermission.permissions) {
-                    if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
                         isGrantedAll = false;
                     }
                 }
@@ -168,8 +168,8 @@ public class AndroidPermission {
 
 
     private void checkPermissions() {
-        Intent intent = new Intent(context, PermissionActivity.class);
+        Intent intent = new Intent(activity, PermissionActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        activity.startActivity(intent);
     }
 }
