@@ -43,7 +43,7 @@ public class CharacteristicUtils {
     }
 
 
-    public static  Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex) {
+    public static Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex) {
         return Observable.create(subscriber -> {
             if (!TextUtils.isEmpty(hex) || hex.length() > 1) {
                 String writeHexValue = hex.replaceAll("[^[0-9][a-f]]", "");
@@ -53,6 +53,7 @@ public class CharacteristicUtils {
                     bytes[i] = Long.decode("0x" + hex.substring(i * 2, i * 2 + 2)).byteValue();
                 }
                 subscriber.onNext(bytes);
+                subscriber.onCompleted();
             } else {
                 subscriber.onError(new GattWriteCharacteristicException(characteristic, "value is null or empty"));
             }

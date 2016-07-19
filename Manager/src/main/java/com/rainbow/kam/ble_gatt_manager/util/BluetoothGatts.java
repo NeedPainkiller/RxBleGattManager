@@ -213,7 +213,7 @@ public class BluetoothGatts {
 
         propertiesString.append(String.format("0x%04X", properties));
         for (int props : PROPERTIES.keySet()) {
-            if (isPropsAvailable(properties, props)) {
+            if (isPropertyAvailable(properties, props)) {
                 propertiesString.append(PROPERTIES.get(props));
             }
         }
@@ -221,12 +221,21 @@ public class BluetoothGatts {
     }
 
 
-    public static boolean isPropsAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int prop) {
+    public static boolean isPropertyAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int prop) {
         return (bluetoothGattCharacteristic.getProperties() & prop) != 0;
     }
 
 
-    public static boolean isPropsAvailable(int properties, int prop) {
+    public static boolean isPropertiesAvailable(BluetoothGattCharacteristic bluetoothGattCharacteristic, int... props) {
+        boolean isPropertiesAvailable = false;
+        for (int prop : props) {
+            isPropertiesAvailable = (bluetoothGattCharacteristic.getProperties() & prop) != 0;
+        }
+        return isPropertiesAvailable;
+    }
+
+
+    public static boolean isPropertyAvailable(int properties, int prop) {
         return (properties & prop) != 0;
     }
 
