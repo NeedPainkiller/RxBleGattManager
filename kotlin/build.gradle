@@ -1,0 +1,95 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jakewharton.hugo'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
+
+    compileOptions {
+        encoding = 'UTF-8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+
+        buildConfigField('String', 'UNKNOWN', '"UNKNOWN"');
+        buildConfigField('String', 'UUID_HEX', '"0x"');
+        buildConfigField('String', 'UUID_REGEX', '"[0-9a-fA-Z]{4}-[0-9a-fA-Z]{4}-[0-9a-fA-Z]{4}-[0-9a-fA-Z]{12}"');
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    Map<String, String> dependencies = rootProject.ext.dependencies;
+
+    testCompile dependencies.JUnit
+    compile dependencies.FileTree
+
+    compile dependencies.Kotlin
+
+    compile dependencies.Stetho
+    compile dependencies.StethoOkHttp
+
+    compile dependencies.Google_SupportV4
+    compile dependencies.Google_AppCompatV7
+    compile dependencies.Google_Design
+    compile dependencies.Google_CardView
+    compile dependencies.Google_RecyclerView
+    compile dependencies.Google_Annotations
+
+    compile dependencies.Guava
+
+    compile dependencies.RxKotlin
+    compile dependencies.RxAndroid
+
+    compile dependencies.dagger
+    apt dependencies.daggerCompilerApt
+    compile dependencies.jsr310
+
+    compile(dependencies.MaterialDialogs) {
+        transitive = true
+    }
+}
+repositories {
+    maven { url "https://jitpack.io" }
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$rootProject.ext.kotlin_version"
+    }
+}

@@ -4,8 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BLE-Gatt_Manager.iml" filepath="$PROJECT_DIR$/BLE-Gatt_Manager.iml" />
       <module fileurl="file://$PROJECT_DIR$/Manager/Manager.iml" filepath="$PROJECT_DIR$/Manager/Manager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Manager/Manager.iml" filepath="$PROJECT_DIR$/Manager/Manager.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Manager/Manager.iml" filepath="$PROJECT_DIR$/Manager/Manager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kotlin/kotlin.iml" filepath="$PROJECT_DIR$/kotlin/kotlin.iml" />
     </modules>
   </component>
 </project>
