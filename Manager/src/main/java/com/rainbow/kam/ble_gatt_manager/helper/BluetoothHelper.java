@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import javax.inject.Inject;
 
@@ -46,7 +45,6 @@ public class BluetoothHelper {
 
     @TargetApi(Build.VERSION_CODES.M)
     public void requestPermission(Activity activity) {
-        Log.e("BluetoothHelper", "requestPermission");
         if (ContextCompat.checkSelfPermission(activity, PERMISSION_COARSE) != PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(activity, PERMISSION_FINE) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new String[]{PERMISSION_COARSE, PERMISSION_FINE}, REQUEST_ENABLE_BLE);

@@ -2,6 +2,8 @@ package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 
+import com.google.common.base.MoreObjects;
+
 import java.util.UUID;
 
 /**
@@ -30,11 +32,11 @@ public class GattWriteCharacteristicException extends GattException {
 
 
     @Override public String toString() {
-        return "GattWriteCharacteristicException{" +
-                "characteristic=" + characteristic +
-                ", UUID=" + UUID +
-                ", subMessage=" + getMessage() +
-                ", state=" + state +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("characteristic", characteristic.getValue())
+                .add("UUID", UUID.toString())
+                .add("subMessage", getMessage())
+                .add("state", state)
+                .toString();
     }
 }

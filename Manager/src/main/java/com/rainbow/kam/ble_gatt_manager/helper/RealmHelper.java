@@ -30,9 +30,6 @@ public class RealmHelper {
             Realm.deleteRealm(configuration);
             realmDB = Realm.getDefaultInstance();
         }
-/*        RealmConfiguration configuration = new RealmConfiguration.Builder(application).deleteRealmIfMigrationNeeded().build();
-        Realm.setDefaultConfiguration(configuration);
-        realmDB = Realm.getDefaultInstance();*/
     }
 
 

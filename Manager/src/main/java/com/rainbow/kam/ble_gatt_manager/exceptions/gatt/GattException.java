@@ -1,5 +1,7 @@
 package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
@@ -17,5 +19,11 @@ public class GattException extends Throwable {
 
     public GattException(String detailMessage) {
         super(detailMessage);
+    }
+
+
+    @Override public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("Message", getMessage()).toString();
     }
 }

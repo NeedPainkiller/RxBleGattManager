@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
 import android.support.annotation.NonNull;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothDevices;
@@ -80,29 +81,32 @@ public class BleDevice implements Comparable<BleDevice> {
     }
 
 
-    @Override public boolean equals(@NonNull final Object o) {
+    @Override public boolean equals(Object object) {
+        if (object == this) {
+            return true;
+        }
 
-        if (this == o) return true;
-        if (getClass() != o.getClass()) return false;
-
-        BleDevice device = (BleDevice) o;
-        return !(getAddress() != null ? !getAddress().equals(device.getAddress()) : device.getAddress() != null);
+        if (object instanceof BleDevice) {
+            BleDevice other = (BleDevice) object;
+            return Objects.equal(this.getAddress(), other.getAddress());
+        } else {
+            return false;
+        }
     }
 
 
     @Override public String toString() {
-        return "DeviceItem{" +
-                "name='" + getName() + '\'' +
-                ", address='" + getAddress() + '\'' +
-                ", bondState=" + getBondState() +
-                ", type=" + getType() +
-                ", rssi=" + rssi +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("name", getName())
+                .add("address", getAddress())
+                .add("bondState", getBondState())
+                .add("type", getType())
+                .add("rssi", rssi).toString();
     }
 
 
     @Override public int hashCode() {
-        return Objects.hashCode(getAddress().hashCode());
+        return Objects.hashCode(getAddress());
     }
 
 

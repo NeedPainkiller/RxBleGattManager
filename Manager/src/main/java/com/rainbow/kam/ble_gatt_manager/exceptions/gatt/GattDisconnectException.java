@@ -1,5 +1,7 @@
 package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
@@ -20,9 +22,9 @@ public class GattDisconnectException extends GattException {
 
 
     @Override public String toString() {
-        return "GattDisconnectException{ " +
-                "macAddress -> '" + macAddress + '\'' +
-                "subMessage -> '" + getMessage() + '\'' +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("MacAddress", macAddress)
+                .add("Message", getMessage())
+                .toString();
     }
 }

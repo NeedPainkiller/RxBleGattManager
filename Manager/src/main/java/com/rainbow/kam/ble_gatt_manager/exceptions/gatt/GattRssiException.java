@@ -1,6 +1,6 @@
 package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattException;
+import com.google.common.base.MoreObjects;
 
 /**
  * Created by Kang Young Won on 2016-05-12.
@@ -15,8 +15,7 @@ public class GattRssiException extends GattException {
 
 
     @Override public String toString() {
-        return "GattWriteCharacteristicException{" +
-                ", state=" + state +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("state", state).toString();
     }
 }

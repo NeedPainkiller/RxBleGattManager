@@ -1,5 +1,6 @@
 package com.rainbow.kam.ble_gatt_manager.model.realm;
 
+import com.google.common.base.MoreObjects;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 
 import java.util.UUID;
@@ -92,12 +93,11 @@ public class GattRecodeModel extends RealmObject {
 
 
     @Override public String toString() {
-        return "GattRecodeModel{" +
-                "DeviceName='" + DeviceName + "\n" +
-                ", DeviceAddress='" + DeviceAddress + "\n" +
-                ", gattOperationType='" + gattOperationType + "\n" +
-                ", gattOperationUUID='" + gattOperationUUID + "\n" +
-                ", gattState='" + gattState + "\n" +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("DeviceName", DeviceName)
+                .add("DeviceAddress", DeviceAddress)
+                .add("gattOperationType", gattOperationType)
+                .add("gattOperationUUID", gattOperationUUID)
+                .add("gattState", gattState).toString();
     }
 }

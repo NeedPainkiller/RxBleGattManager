@@ -210,7 +210,6 @@ public class BluetoothGatts {
 
     public static String getAvailableProperties(int properties) {
         StringBuilder propertiesString = new StringBuilder();
-
         propertiesString.append(String.format("0x%04X", properties));
         for (int props : PROPERTIES.keySet()) {
             if (isPropertyAvailable(properties, props)) {

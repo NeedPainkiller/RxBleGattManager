@@ -38,17 +38,23 @@ public class GattObserveData {
     }
 
 
-    @Override public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    @Override public boolean equals(Object object) {
 
-        GattObserveData that = (GattObserveData) o;
+        if (object == this) {
+            return true;
+        }
 
-        return state == that.state && (gattCharacteristic != null ? gattCharacteristic.equals(that.gattCharacteristic) : that.gattCharacteristic == null);
+        if (object instanceof GattObserveData) {
+            GattObserveData other = (GattObserveData) object;
+            return Objects.equal(this.gattCharacteristic.getUuid().toString(), other.gattCharacteristic.getUuid().toString())
+                    && Objects.equal(this.state, other.state);
+        } else {
+            return false;
+        }
     }
 
 
     @Override public int hashCode() {
-        return Objects.hashCode(gattCharacteristic);
+        return Objects.hashCode(gattCharacteristic) + Objects.hashCode(state);
     }
 }

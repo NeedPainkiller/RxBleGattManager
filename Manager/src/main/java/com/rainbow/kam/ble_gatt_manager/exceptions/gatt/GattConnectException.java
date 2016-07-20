@@ -1,5 +1,7 @@
 package com.rainbow.kam.ble_gatt_manager.exceptions.gatt;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * Created by Kang Young Won on 2016-05-12.
  */
@@ -12,25 +14,23 @@ public class GattConnectException extends GattException {
 
 
     private final String macAddress;
-    private final String subMessage;
 
 
     public GattConnectException(String macAddress, String subMessage) {
+        super(subMessage);
         this.macAddress = macAddress;
-        this.subMessage = subMessage;
     }
 
 
     public GattConnectException(String subMessage) {
-        this.macAddress = UNKNOWN;
-        this.subMessage = subMessage;
+        this(UNKNOWN, subMessage);
     }
 
 
     @Override public String toString() {
-        return "GattConnectException{ " +
-                "macAddress -> '" + macAddress + '\'' +
-                "subMessage -> '" + subMessage + '\'' +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("MacAddress", macAddress)
+                .add("Message", getMessage())
+                .toString();
     }
 }

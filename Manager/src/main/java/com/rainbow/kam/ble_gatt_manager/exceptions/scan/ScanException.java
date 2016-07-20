@@ -18,3 +18,4 @@ public class ScanException extends Throwable {
         super(detailMessage);
     }
 }
+

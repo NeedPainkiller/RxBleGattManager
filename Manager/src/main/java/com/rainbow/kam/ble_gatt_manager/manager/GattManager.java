@@ -11,13 +11,18 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.content.IntentFilter;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Bytes;
 import com.rainbow.kam.ble_gatt_manager.broadcast.BondDeviceBroadcastReceiver;
-import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.*;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattDisconnectException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattReadCharacteristicException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattRssiException;
+import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
@@ -32,12 +37,19 @@ import rx.Observable;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
 
-import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.*;
+import static android.bluetooth.BluetoothProfile.GATT;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.NONE_ADDRESS;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.NONE_APPLICATION;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.NONE_BLE_DEVICE;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.NONE_BT;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.NOT_CONNECTED;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException.STATUS_RESULT_FAIL;
 import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationCharacteristicException.DESCRIPTION_WRITE_FAIL;
-import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.NONE_SERVICES;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.NONE_UUID_CHARACTERISTIC;
 import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException.NULL_OR_EMPTY_DATA;
-import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.*;
-import static android.bluetooth.BluetoothProfile.*;
+import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.STATE_ON_NEXT;
+import static com.rainbow.kam.ble_gatt_manager.model.GattObserveData.STATE_ON_START;
 
 /**
  * Created by kam6512 on 2015-10-29.
@@ -152,8 +164,7 @@ public class GattManager implements IGattManager {
     @Override public Observable<BluetoothDevice> observeBond()
             throws GattConnectException {
         if (isConnected()) {
-            final IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-            final BondDeviceBroadcastReceiver receiver = new BondDeviceBroadcastReceiver(application, filter);
+            final BondDeviceBroadcastReceiver receiver = new BondDeviceBroadcastReceiver(application);
             return Observable.create(receiver).doOnSubscribe(() -> bleDevice.getDevice().createBond());
         } else {
             throw GATT_NOT_CONNECTED;
