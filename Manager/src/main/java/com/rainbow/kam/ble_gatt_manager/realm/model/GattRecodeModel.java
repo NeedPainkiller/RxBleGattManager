@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.model.realm;
+package com.rainbow.kam.ble_gatt_manager.realm.model;
 
 import com.google.common.base.MoreObjects;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;

@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.manager.realm;
+package com.rainbow.kam.ble_gatt_manager.realm.manager;
 
 import android.app.Application;
 import android.bluetooth.BluetoothDevice;
@@ -9,10 +9,10 @@ import android.bluetooth.BluetoothGattService;
 import com.google.common.primitives.Bytes;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
 import com.rainbow.kam.ble_gatt_manager.helper.RealmHelper;
-import com.rainbow.kam.ble_gatt_manager.manager.GattManager;
+import com.rainbow.kam.ble_gatt_manager.legacy.model.GattObserveData;
+import com.rainbow.kam.ble_gatt_manager.legacy.manager.rx.GattManager;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
-import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
-import com.rainbow.kam.ble_gatt_manager.model.realm.GattRecodeModel;
+import com.rainbow.kam.ble_gatt_manager.realm.model.GattRecodeModel;
 import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
 
 import java.util.List;
@@ -22,7 +22,24 @@ import javax.inject.Inject;
 
 import rx.Observable;
 
-import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.*;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.BOND_BONDED;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.BOND_BONDING;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.BOND_NONE;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.GATT_FAILURE;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.GATT_SUCCESS;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.STATE_CONNECTED;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.STATE_DISCONNECTED;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_BOND;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_CONNECTION;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_DISCOVER;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_INDICATION;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_INDICATION_EMPTY;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_NOTIFICATION;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_NOTIFICATION_EMPTY;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_READ;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_WRITE;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.TYPE_WRITE_EMPTY;
+import static com.rainbow.kam.ble_gatt_manager.util.GattRecodes.UUID_NONE;
 
 /**
  * Created by Kang Young Won on 2016-06-30.
