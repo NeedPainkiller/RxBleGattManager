@@ -4,7 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'realm-android'
 
-apply plugin: 'com.novoda.bintray-release'
+/*apply plugin: 'com.novoda.bintray-release'
 
 publish {
     userOrg = 'kam6512'
@@ -15,7 +15,7 @@ publish {
     website = 'https://github.com/kam6512/BLE-Gatt_Manager'
     issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
     repository = "https://github.com/kam6512/BLE-Gatt_Manager.git"
-}
+}*/
 
 android {
     compileSdkVersion 24
@@ -49,35 +49,44 @@ android {
     lintOptions {
         abortOnError false
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 dependencies {
+    def ext = rootProject.ext;
+    Map<String, String> BasicDependencies = ext.BasicDependencies;
+    Map<String, String> TestDependencies = ext.TestDependencies;
+    Map<String, String> InjectionDependencies = ext.InjectionDependencies;
+    Map<String, String> GoogleDependencies = ext.GoogleDependencies;
+    Map<String, String> RxDependencies = ext.RxDependencies;
+    Map<String, String> UiDependencies = ext.UiDependencies;
+    Map<String, String> ToolsDependencies = ext.ToolsDependencies;
+    Map<String, String> otherDependencies = ext.OtherDependencies;
 
-    Map<String, String> dependencies = rootProject.ext.dependencies;
+    compile BasicDependencies.FileTree
+    testCompile TestDependencies.JUnit
 
-    testCompile dependencies.JUnit
-    compile dependencies.FileTree
+    compile ToolsDependencies.Stetho
+    compile ToolsDependencies.StethoOkHttp
 
-    compile dependencies.Stetho
-    compile dependencies.StethoOkHttp
+    compile GoogleDependencies.Google_SupportV4
+    compile GoogleDependencies.Google_AppCompatV7
+    compile GoogleDependencies.Google_Design
+    compile GoogleDependencies.Google_CardView
+    compile GoogleDependencies.Google_RecyclerView
+    compile GoogleDependencies.Google_Annotations
 
-    compile dependencies.Google_SupportV4
-    compile dependencies.Google_AppCompatV7
-    compile dependencies.Google_Design
-    compile dependencies.Google_CardView
-    compile dependencies.Google_RecyclerView
-    compile dependencies.Google_Annotations
+    compile GoogleDependencies.Guava
 
-    compile dependencies.Guava
+    compile RxDependencies.RxJava
+    compile RxDependencies.RxAndroid
 
-    compile dependencies.RxJava
-    compile dependencies.RxAndroid
+    compile InjectionDependencies.dagger
+    apt InjectionDependencies.daggerCompilerApt
 
-    compile dependencies.dagger
-    apt dependencies.daggerCompilerApt
-    compile dependencies.jsr310
-
-    compile(dependencies.MaterialDialogs) {
+    compile(UiDependencies.MaterialDialogs) {
         transitive = true
     }
 }
@@ -94,10 +103,11 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
-        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath "io.realm:realm-gradle-plugin:1.0.1"
+        Map<String, String> ClassPaths = rootProject.ext.ClassPaths;
+        classpath ClassPaths.Gradle
+        classpath ClassPaths.Hugo
+        classpath ClassPaths.Retrolambda
+        classpath ClassPaths.APT
+        classpath ClassPaths.RealmJava
     }
 }
