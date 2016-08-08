@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.model;
+package com.rainbow.kam.ble_gatt_manager.legacy.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 

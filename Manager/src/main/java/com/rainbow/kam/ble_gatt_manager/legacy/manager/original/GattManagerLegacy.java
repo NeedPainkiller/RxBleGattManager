@@ -1,5 +1,5 @@
 
-package com.rainbow.kam.ble_gatt_manager.manager.legacy;
+package com.rainbow.kam.ble_gatt_manager.legacy.manager.original;
 
 import android.app.Activity;
 import android.app.Application;
