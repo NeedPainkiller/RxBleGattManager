@@ -12,72 +12,84 @@ import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 import javax.inject.Inject;
 
 import rx.Observable;
-import rx.subjects.PublishSubject;
+import rx.Subscriber;
+import rx.android.MainThreadSubscription;
 
-import static com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException.*;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException.STATUS_BLE_NOT_ENABLED;
+import static com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException.STATUS_BLE_NOT_SUPPORTED;
 
 /**
  * Created by Kang Young Won on 2016-05-24.
  */
-public class RxBleScanner implements IRxBleScanner {
-
-    private final BluetoothAdapter bluetoothAdapter;
-    private BluetoothLeScanner scanner;
-    private PublishSubject<BleDevice> scanSubject;
-
+public class RxBleScanner {
 
     @Inject public RxBleScanner() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
 
-    private final ScanCallback callback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
-            super.onScanResult(callbackType, result);
-            BleDevice discoveredDevice = BleDevice.create(result);
-            scanSubject.onNext(discoveredDevice);
-        }
-    };
+    public Observable<BleDevice> observeScan() {
+        return Observable.create(new RxBleScannerOnSubscribe()).onBackpressureBuffer();
+    }
 
 
-    @Override public Observable<BleDevice> observeScan() {
-        return Observable.merge(scanSubject = PublishSubject.create(),
-                Observable.create((Observable.OnSubscribe<BleDevice>) subscriber -> {
-                    if (!isBleSupported()) {
-                        subscriber.onError(new ScanException(STATUS_BLE_NOT_SUPPORTED));
+    private class RxBleScannerOnSubscribe implements Observable.OnSubscribe<BleDevice> {
+        private BluetoothAdapter bluetoothAdapter;
+        private BluetoothLeScanner scanner;
+
+
+        @Override public void call(Subscriber<? super BleDevice> subscriber) {
+            setAdapter();
+            setScanner();
+
+            if (!isBleSupported()) {
+                subscriber.onError(new ScanException(STATUS_BLE_NOT_SUPPORTED));
+            }
+            if (!isBleEnabled()) {
+                subscriber.onError(new ScanException(STATUS_BLE_NOT_ENABLED));
+            }
+
+            final ScanCallback callback = new ScanCallback() {
+                @Override
+                public void onScanResult(int callbackType, ScanResult result) {
+                    super.onScanResult(callbackType, result);
+                    BleDevice discoveredDevice = BleDevice.create(result);
+                    subscriber.onNext(discoveredDevice);
+                }
+            };
+
+            subscriber.add(new MainThreadSubscription() {
+                @Override protected void onUnsubscribe() {
+                    if (scanner != null && isBleSupported() && isBleEnabled()) {
+                        scanner.stopScan(callback);
                     }
-                    if (!isBleEnabled()) {
-                        subscriber.onError(new ScanException(STATUS_BLE_NOT_ENABLED));
-                    }
-                    setScanner();
-                    scanner.startScan(callback);
-                }))
-                .onBackpressureBuffer()
-                .doOnSubscribe(this::stopScan);
-    }
-
-
-    private boolean isBleSupported() {
-        return BluetoothHelper.IS_BLE_SUPPORTED;
-    }
-
-
-    private boolean isBleEnabled() {
-        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
-    }
-
-
-    private void setScanner() {
-        if (scanner == null) {
-            scanner = bluetoothAdapter.getBluetoothLeScanner();
-        }
-    }
-
-
-    private void stopScan() {
-        if (scanner != null && isBleSupported() && isBleEnabled()) {
+                }
+            });
             scanner.stopScan(callback);
+            scanner.startScan(callback);
+        }
+
+
+        private void setAdapter() {
+            if (bluetoothAdapter == null) {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            }
+        }
+
+
+        private void setScanner() {
+            if (scanner == null) {
+                scanner = bluetoothAdapter.getBluetoothLeScanner();
+            }
+        }
+
+
+        private boolean isBleSupported() {
+            return BluetoothHelper.IS_BLE_SUPPORTED;
+        }
+
+
+        private boolean isBleEnabled() {
+            return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
         }
     }
 }
