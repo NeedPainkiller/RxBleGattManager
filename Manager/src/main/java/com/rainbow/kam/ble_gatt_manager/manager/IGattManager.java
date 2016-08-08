@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothGattService;
 
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
-import com.rainbow.kam.ble_gatt_manager.model.GattObserveData;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,29 +43,29 @@ public interface IGattManager {
 
     Observable<BluetoothGattCharacteristic> observeRead(final BluetoothGattCharacteristic characteristicToRead);
 
-    Observable<GattObserveData> observeWrite(final UUID uuidToWrite, final List<Byte> valuesToWrite);
+    Observable<BluetoothGattCharacteristic> observeWrite(final UUID uuidToWrite, final List<Byte> valuesToWrite);
 
-    Observable<GattObserveData> observeWrite(final UUID uuidToWrite, final byte[] valuesToWrite);
+    Observable<BluetoothGattCharacteristic> observeWrite(final UUID uuidToWrite, final byte[] valuesToWrite);
 
-    Observable<GattObserveData> observeWrite(final BluetoothGattCharacteristic characteristicToWrite,
+    Observable<BluetoothGattCharacteristic> observeWrite(final BluetoothGattCharacteristic characteristicToWrite,
                                              final List<Byte> valuesToWrite);
 
-    Observable<GattObserveData> observeWrite(final BluetoothGattCharacteristic characteristicToWrite,
+    Observable<BluetoothGattCharacteristic> observeWrite(final BluetoothGattCharacteristic characteristicToWrite,
                                              final byte[] valuesToWrite);
 
-    Observable<GattObserveData> observeNotification(final UUID uuidToNotification,
+    Observable<BluetoothGattCharacteristic> observeNotification(final UUID uuidToNotification,
                                                     final boolean enableNotification);
 
 
-    Observable<GattObserveData> observeNotification(final BluetoothGattCharacteristic characteristicToNotification,
+    Observable<BluetoothGattCharacteristic> observeNotification(final BluetoothGattCharacteristic characteristicToNotification,
                                                     final boolean enableNotification);
 
     Boolean isNotificationEnabled(final BluetoothGattCharacteristic characteristic);
 
-    Observable<GattObserveData> observeIndication(final UUID uuidToIndication);
+    Observable<BluetoothGattCharacteristic> observeIndication(final UUID uuidToIndication);
 
 
-    Observable<GattObserveData> observeIndication(final BluetoothGattCharacteristic characteristicToIndication);
+    Observable<BluetoothGattCharacteristic> observeIndication(final BluetoothGattCharacteristic characteristicToIndication);
 
     Boolean isIndicationEnabled(final BluetoothGattCharacteristic characteristic);
 }
