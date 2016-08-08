@@ -3,7 +3,7 @@ package com.rainbow.kam.ble_gatt_manager.helper;
 import android.app.Application;
 import android.util.Log;
 
-import com.rainbow.kam.ble_gatt_manager.model.realm.GattRecodeModel;
+import com.rainbow.kam.ble_gatt_manager.realm.model.GattRecodeModel;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
