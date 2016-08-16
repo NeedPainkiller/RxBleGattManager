@@ -1,1 +1,1 @@
-include ':Manager', ':kotlin'
+include ':Manager'
