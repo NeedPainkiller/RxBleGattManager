@@ -6,7 +6,6 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 
 import com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException;
-import com.rainbow.kam.ble_gatt_manager.helper.BluetoothHelper;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 
 import javax.inject.Inject;
@@ -17,6 +16,7 @@ import rx.android.MainThreadSubscription;
 
 import static com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException.STATUS_BLE_NOT_ENABLED;
 import static com.rainbow.kam.ble_gatt_manager.exceptions.scan.ScanException.STATUS_BLE_NOT_SUPPORTED;
+import static com.rainbow.kam.ble_gatt_manager.helper.BluetoothHelper.IS_BLE_SUPPORTED;
 
 /**
  * Created by Kang Young Won on 2016-05-24.
@@ -41,7 +41,7 @@ public class RxBleScanner {
             setAdapter();
             setScanner();
 
-            if (!isBleSupported()) {
+            if (!IS_BLE_SUPPORTED) {
                 subscriber.onError(new ScanException(STATUS_BLE_NOT_SUPPORTED));
             }
             if (!isBleEnabled()) {
@@ -59,7 +59,7 @@ public class RxBleScanner {
 
             subscriber.add(new MainThreadSubscription() {
                 @Override protected void onUnsubscribe() {
-                    if (scanner != null && isBleSupported() && isBleEnabled()) {
+                    if (scanner != null && IS_BLE_SUPPORTED && isBleEnabled()) {
                         scanner.stopScan(callback);
                     }
                 }
@@ -80,11 +80,6 @@ public class RxBleScanner {
             if (scanner == null) {
                 scanner = bluetoothAdapter.getBluetoothLeScanner();
             }
-        }
-
-
-        private boolean isBleSupported() {
-            return BluetoothHelper.IS_BLE_SUPPORTED;
         }
 
 
