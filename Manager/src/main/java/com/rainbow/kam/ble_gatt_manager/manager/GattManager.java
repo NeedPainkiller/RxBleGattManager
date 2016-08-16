@@ -23,7 +23,7 @@ import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscovere
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattRssiException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
+import com.rainbow.kam.ble_gatt_manager.model.BluetoothGatts;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +57,6 @@ public class GattManager implements IGattManager {
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
-
     private BleDevice bleDevice;
 
     private Subscription rssiTimerSubscription;
@@ -300,8 +299,7 @@ public class GattManager implements IGattManager {
             characteristicToWrite.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
             characteristicToWrite.setValue(valuesToWrite);
             bluetoothGatt.writeCharacteristic(characteristicToWrite);
-        }).doOnSubscribe(() -> currentWriteCharacteristic = characteristicToWrite)
-                .doOnUnsubscribe(() -> gattManagerCallBack.setWriteListener(null));
+        }).doOnSubscribe(() -> currentWriteCharacteristic = characteristicToWrite).doOnUnsubscribe(() -> gattManagerCallBack.setWriteListener(null));
     }
 
 
@@ -456,8 +454,7 @@ public class GattManager implements IGattManager {
     }
 
 
-    private boolean isCharacteristicAvailable(final BluetoothGattCharacteristic callbackCharacteristic,
-                                              final BluetoothGattCharacteristic currentCharacteristic) {
+    private boolean isCharacteristicAvailable(final BluetoothGattCharacteristic callbackCharacteristic, final BluetoothGattCharacteristic currentCharacteristic) {
         return (currentCharacteristic != null && callbackCharacteristic.equals(currentCharacteristic));
     }
 }

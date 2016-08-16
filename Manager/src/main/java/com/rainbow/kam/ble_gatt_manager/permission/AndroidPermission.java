@@ -19,17 +19,17 @@ import rx.subjects.PublishSubject;
 
 public class AndroidPermission {
 
-    private Activity activity;
+    private final Activity activity;
 
-    protected static String packageName;
-    protected static String[] permissions;
-    protected static String explanationMessage;
-    protected static String explanationConfirmText;
-    protected static String denyMessage;
-    protected static String deniedCloseButtonText;
-    protected static String settingButtonText;
+    static String packageName;
+    static String[] permissions;
+    static String explanationMessage;
+    static String explanationConfirmText;
+    static String denyMessage;
+    static String deniedCloseButtonText;
+    static String settingButtonText;
 
-    protected static PublishSubject<ArrayList<String>> permissionSubject = PublishSubject.create();
+    static final PublishSubject<ArrayList<String>> permissionSubject = PublishSubject.create();
 
 
     public AndroidPermission(Activity activity) {
