@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.util;
+package com.rainbow.kam.ble_gatt_manager.legacy.util;
 
 /**
  * Created by Kang Young Won on 2016-07-01.

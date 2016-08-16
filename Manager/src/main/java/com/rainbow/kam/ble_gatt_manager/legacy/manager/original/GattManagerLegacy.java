@@ -22,7 +22,7 @@ import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattConnectException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattReadCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
+import com.rainbow.kam.ble_gatt_manager.model.BluetoothGatts;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattRssiException;
 

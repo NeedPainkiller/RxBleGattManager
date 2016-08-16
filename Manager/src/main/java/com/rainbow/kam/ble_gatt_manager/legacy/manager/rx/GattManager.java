@@ -25,7 +25,7 @@ import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattRssiException;
 import com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 import com.rainbow.kam.ble_gatt_manager.legacy.model.GattObserveData;
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothGatts;
+import com.rainbow.kam.ble_gatt_manager.model.BluetoothGatts;
 
 import java.util.List;
 import java.util.UUID;

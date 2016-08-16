@@ -1,6 +1,7 @@
-package com.rainbow.kam.ble_gatt_manager.realm.model;
+package com.rainbow.kam.ble_gatt_manager.legacy.model;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import com.rainbow.kam.ble_gatt_manager.model.BleDevice;
 
 import java.util.UUID;
@@ -11,39 +12,33 @@ import io.realm.RealmObject;
  * Created by Kang Young Won on 2016-07-01.
  */
 public class GattRecodeModel extends RealmObject {
-    private String DeviceName;
-    private String DeviceAddress;
+    private String deviceName;
+    private String deviceAddress;
 
     private String gattOperationType;
     private String gattOperationUUID;
     private String gattState;
 
 
-    /*public GattRecodeModel(BleDevice bleDevice) {
-        DeviceName = bleDevice.getName();
-        DeviceAddress = bleDevice.getAddress();
-    }*/
-
-
     public void setDeviceAddress(String deviceAddress) {
-        DeviceAddress = deviceAddress;
+        this.deviceAddress = deviceAddress;
     }
 
 
     public void setDeviceAddress(BleDevice bleDevice) {
-        DeviceAddress = bleDevice.getAddress();
+        deviceAddress = bleDevice.getAddress();
     }
 
 
     public void setDeviceName(String deviceName) {
 
-        DeviceName = deviceName;
+        this.deviceName = deviceName;
     }
 
 
     public void setDeviceName(BleDevice bleDevice) {
 
-        DeviceName = bleDevice.getName();
+        deviceName = bleDevice.getName();
     }
 
 
@@ -68,12 +63,12 @@ public class GattRecodeModel extends RealmObject {
 
 
     public String getDeviceName() {
-        return DeviceName;
+        return deviceName;
     }
 
 
     public String getDeviceAddress() {
-        return DeviceAddress;
+        return deviceAddress;
     }
 
 
@@ -92,10 +87,28 @@ public class GattRecodeModel extends RealmObject {
     }
 
 
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GattRecodeModel that = (GattRecodeModel) o;
+        return Objects.equal(this.deviceName, that.deviceName)
+                || Objects.equal(this.deviceAddress, that.deviceAddress)
+                || Objects.equal(this.gattOperationType, that.gattOperationType)
+                || Objects.equal(this.gattOperationUUID, that.gattOperationUUID)
+                || Objects.equal(this.gattState, that.gattState);
+    }
+
+
+    @Override public int hashCode() {
+        return Objects.hashCode(deviceName, deviceAddress, gattOperationType, gattOperationUUID, gattState);
+    }
+
+
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("DeviceName", DeviceName)
-                .add("DeviceAddress", DeviceAddress)
+                .add("deviceName", deviceName)
+                .add("deviceAddress", deviceAddress)
                 .add("gattOperationType", gattOperationType)
                 .add("gattOperationUUID", gattOperationUUID)
                 .add("gattState", gattState).toString();

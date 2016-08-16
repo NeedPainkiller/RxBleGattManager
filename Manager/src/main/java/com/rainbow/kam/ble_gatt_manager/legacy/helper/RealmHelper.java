@@ -1,9 +1,9 @@
-package com.rainbow.kam.ble_gatt_manager.helper;
+package com.rainbow.kam.ble_gatt_manager.legacy.helper;
 
 import android.app.Application;
 import android.util.Log;
 
-import com.rainbow.kam.ble_gatt_manager.realm.model.GattRecodeModel;
+import com.rainbow.kam.ble_gatt_manager.legacy.model.GattRecodeModel;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
