@@ -59,7 +59,7 @@ public class BondDeviceBroadcastReceiver implements Observable.OnSubscribe<Bluet
 
         if (object instanceof BondDeviceBroadcastReceiver) {
             BondDeviceBroadcastReceiver other = (BondDeviceBroadcastReceiver) object;
-            return java.util.Objects.equals(this.intentFilter, other.intentFilter);
+            return Objects.equal(this.intentFilter, other.intentFilter);
         } else {
             return false;
         }
