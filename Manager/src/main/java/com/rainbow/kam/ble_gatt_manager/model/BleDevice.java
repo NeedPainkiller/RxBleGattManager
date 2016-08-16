@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import com.rainbow.kam.ble_gatt_manager.util.BluetoothDevices;
 import com.rainbow.kam.ble_gatt_manager.BuildConfig;
 
 /**

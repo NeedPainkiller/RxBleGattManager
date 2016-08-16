@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.rainbow.kam.ble_gatt_manager.util;
+package com.rainbow.kam.ble_gatt_manager.model;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;

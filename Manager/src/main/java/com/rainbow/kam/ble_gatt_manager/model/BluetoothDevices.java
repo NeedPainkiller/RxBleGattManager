@@ -1,4 +1,4 @@
-package com.rainbow.kam.ble_gatt_manager.util;
+package com.rainbow.kam.ble_gatt_manager.model;
 
 import android.util.SparseArray;
 
