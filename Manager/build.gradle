@@ -4,18 +4,18 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'realm-android'
 
-/*apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 publish {
     userOrg = 'kam6512'
     groupId = 'com.rainbow.library'
     artifactId = 'android-ble-gatt-manager'
-    publishVersion = '0.1.3.4'
+    publishVersion = '0.1.4.0'
     desc = 'Android BLE GATT MANAGER'
     website = 'https://github.com/kam6512/BLE-Gatt_Manager'
     issueTracker = "https://github.com/kam6512/BLE-Gatt_Manager/issues"
     repository = "https://github.com/kam6512/BLE-Gatt_Manager.git"
-}*/
+}
 
 android {
     compileSdkVersion 24
@@ -63,7 +63,6 @@ dependencies {
     Map<String, String> RxDependencies = ext.RxDependencies;
     Map<String, String> UiDependencies = ext.UiDependencies;
     Map<String, String> ToolsDependencies = ext.ToolsDependencies;
-    Map<String, String> otherDependencies = ext.OtherDependencies;
 
     compile BasicDependencies.FileTree
     testCompile TestDependencies.JUnit
