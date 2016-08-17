@@ -192,7 +192,7 @@ public class GattManager implements IGattManager {
                 gattManagerCallBack.setServiceListener(new GattServiceOnSubscribe() {
                     @Override public void onServiceDiscovered(List<BluetoothGattService> services) {
                         subscriber.onNext(services);
-                        subscriber.onCompleted();
+//                        subscriber.onCompleted();
                     }
 
 
@@ -231,7 +231,7 @@ public class GattManager implements IGattManager {
                 @Override
                 public void onCharacteristicReadSucceeded(BluetoothGattCharacteristic characteristic) {
                     subscriber.onNext(characteristic);
-                    subscriber.onCompleted();
+//                    subscriber.onCompleted();
                 }
 
 
