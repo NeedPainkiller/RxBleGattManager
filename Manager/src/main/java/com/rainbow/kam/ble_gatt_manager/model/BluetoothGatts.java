@@ -229,6 +229,9 @@ public class BluetoothGatts {
         boolean isPropertiesAvailable = false;
         for (int prop : props) {
             isPropertiesAvailable = (bluetoothGattCharacteristic.getProperties() & prop) != 0;
+            if (isPropertiesAvailable) {
+                return isPropertiesAvailable;
+            }
         }
         return isPropertiesAvailable;
     }
