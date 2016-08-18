@@ -20,51 +20,37 @@ public class GattManagerCallBack extends BluetoothGattCallback {
 
 
     public void setConnectionListener(GattConnectionOnSubscribe connectionListener) {
-        if (this.connectionListener == null) {
-            this.connectionListener = connectionListener;
-        }
+        this.connectionListener = connectionListener;
     }
 
 
     public void setRssiListener(GattRssiOnSubscribe rssiListener) {
-        if (this.rssiListener == null) {
-            this.rssiListener = rssiListener;
-        }
+        this.rssiListener = rssiListener;
     }
 
 
     public void setServiceListener(GattServiceOnSubscribe serviceListener) {
-        if (this.serviceListener == null) {
-            this.serviceListener = serviceListener;
-        }
+        this.serviceListener = serviceListener;
     }
 
 
     public void setReadListener(GattReadCharacteristicOnSubscribe readListener) {
-        if (this.readListener == null) {
-            this.readListener = readListener;
-        }
+        this.readListener = readListener;
     }
 
 
     public void setWriteListener(GattWriteCharacteristicOnSubscribe writeListener) {
-        if (this.writeListener == null) {
-            this.writeListener = writeListener;
-        }
+        this.writeListener = writeListener;
     }
 
 
     public void setNotifyListener(GattNotifyCharacteristicOnSubscribe notifyListener) {
-        if (this.notifyListener == null) {
-            this.notifyListener = notifyListener;
-        }
+        this.notifyListener = notifyListener;
     }
 
 
     public void setIndicateListener(GattIndicateCharacteristicOnSubscribe indicateListener) {
-        if (this.indicateListener == null) {
-            this.indicateListener = indicateListener;
-        }
+        this.indicateListener = indicateListener;
     }
 
 

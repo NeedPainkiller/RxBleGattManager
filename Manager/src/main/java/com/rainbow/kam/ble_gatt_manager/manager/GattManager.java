@@ -231,7 +231,6 @@ public class GattManager implements IGattManager {
                 @Override
                 public void onCharacteristicReadSucceeded(BluetoothGattCharacteristic characteristic) {
                     subscriber.onNext(characteristic);
-//                    subscriber.onCompleted();
                 }
 
 
@@ -404,8 +403,7 @@ public class GattManager implements IGattManager {
             BluetoothGattDescriptor indicationDescriptor = characteristicToIndication.getDescriptor(BluetoothGatts.CLIENT_CHARACTERISTIC_CONFIG);
             indicationDescriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
             bluetoothGatt.writeDescriptor(indicationDescriptor);
-        }).doOnSubscribe(() -> currentIndicationCharacteristic = characteristicToIndication)
-                .doOnUnsubscribe(() -> gattManagerCallBack.setIndicateListener(null));
+        }).doOnSubscribe(() -> currentIndicationCharacteristic = characteristicToIndication).doOnUnsubscribe(() -> gattManagerCallBack.setIndicateListener(null));
     }
 
 
