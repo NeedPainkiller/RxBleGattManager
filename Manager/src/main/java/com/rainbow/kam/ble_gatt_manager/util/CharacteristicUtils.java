@@ -62,9 +62,6 @@ public class CharacteristicUtils {
 
 
     @Override public String toString() {
-        return "CharacteristicUtils{" +
-                "Observable<HashMap<String, String>> getFormattedValues(BluetoothGattCharacteristic characteristic)" +
-                "Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex)" +
-                "}";
+        return "CharacteristicUtils{}";
     }
 }
