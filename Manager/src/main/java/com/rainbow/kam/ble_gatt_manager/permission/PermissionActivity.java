@@ -43,6 +43,29 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
 
+    private void checkPermissions(boolean fromOnActivityResult) {
+        ArrayList<String> needPermissions = new ArrayList<>();
+        boolean showRationale = false;
+
+        for (String permission : AndroidPermission.permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                needPermissions.add(permission);
+                showRationale = true;
+            }
+        }
+
+        if (needPermissions.isEmpty()) {
+            permissionGranted();
+        } else if (fromOnActivityResult) {
+            permissionDenied(needPermissions);
+        } else if (showRationale && !TextUtils.isEmpty(AndroidPermission.explanationMessage)) {
+            showRationaleDialog(needPermissions);
+        } else {
+            requestPermissions(needPermissions);
+        }
+    }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         ArrayList<String> deniedPermissions = new ArrayList<>();
@@ -73,29 +96,6 @@ public class PermissionActivity extends AppCompatActivity {
         AndroidPermission.permissionSubject.onNext(deniedPermissions);
         finish();
         overridePendingTransition(0, 0);
-    }
-
-
-    private void checkPermissions(boolean fromOnActivityResult) {
-        ArrayList<String> needPermissions = new ArrayList<>();
-        boolean showRationale = false;
-
-        for (String permission : AndroidPermission.permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                needPermissions.add(permission);
-                showRationale = true;
-            }
-        }
-
-        if (needPermissions.isEmpty()) {
-            permissionGranted();
-        } else if (fromOnActivityResult) {
-            permissionDenied(needPermissions);
-        } else if (showRationale && !TextUtils.isEmpty(AndroidPermission.explanationMessage)) {
-            showRationaleDialog(needPermissions);
-        } else {
-            requestPermissions(needPermissions);
-        }
     }
 
 

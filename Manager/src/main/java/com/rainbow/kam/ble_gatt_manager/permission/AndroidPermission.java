@@ -3,7 +3,6 @@ package com.rainbow.kam.ble_gatt_manager.permission;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
-import rx.subjects.PublishSubject;
 
 
 public class AndroidPermission {
@@ -29,7 +27,7 @@ public class AndroidPermission {
     static String deniedCloseButtonText;
     static String settingButtonText;
 
-    static final PublishSubject<ArrayList<String>> permissionSubject = PublishSubject.create();
+//    static final PublishSubject<ArrayList<String>> permissionSubject = PublishSubject.create();
 
 
     public AndroidPermission(Activity activity) {
@@ -125,7 +123,7 @@ public class AndroidPermission {
 
 
     public Observable<ArrayList<String>> check() {
-        return Observable.merge(permissionSubject, Observable.create((Observable.OnSubscribe<ArrayList<String>>) subscriber -> {
+        return Observable.create(subscriber -> {
             if (isEmpty(permissions)) {
                 subscriber.onError(new NullPointerException("You must setPermissions() on AndroidPermission"));
                 return;
@@ -141,12 +139,8 @@ public class AndroidPermission {
                     return;
                 }
             }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                subscriber.onCompleted();
-            } else {
-                checkPermissions();
-            }
-        }));
+            startPermissionActivity();
+        });
     }
 
 
@@ -167,7 +161,7 @@ public class AndroidPermission {
     }
 
 
-    private void checkPermissions() {
+    private void startPermissionActivity() {
         Intent intent = new Intent(activity, PermissionActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
