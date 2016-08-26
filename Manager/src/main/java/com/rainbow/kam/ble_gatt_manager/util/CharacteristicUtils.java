@@ -16,6 +16,15 @@ import rx.schedulers.Schedulers;
  * Created by Kang Young Won on 2016-05-20.
  */
 public class CharacteristicUtils {
+    public static String HEXADECIMAL_KEY = "HEX";
+    public static String DECIMAL_KEY = "DEC";
+    public static String STRING_KEY = "STR";
+
+    private static String HEXADECIMAL_PREFIX = "0x";
+    private static String HEXADECIMAL_FORMAT = "%02X";
+    private static int DECIMAL_BITWISE = 0xff;
+    private static String STRING_FORMAT = "%c";
+    private static String HEXADECIMAL_REGEX = "[^[0-9][a-f]]";
 
 
     public static Observable<HashMap<String, String>> getFormattedValues(BluetoothGattCharacteristic characteristic) {
@@ -28,13 +37,13 @@ public class CharacteristicUtils {
 
         return Observable.create((Observable.OnSubscribe<HashMap<String, String>>) subscriber -> {
             for (byte byteChar : value) {
-                hexBuilder.append("0x").append(String.format("%02X", byteChar));
-                decBuilder.append(byteChar & 0xff);
-                strBuilder.append(String.format("%c", byteChar));
+                hexBuilder.append(HEXADECIMAL_PREFIX).append(String.format(HEXADECIMAL_FORMAT, byteChar));
+                decBuilder.append(byteChar & DECIMAL_BITWISE);
+                strBuilder.append(String.format(STRING_FORMAT, byteChar));
             }
-            valueMap.put("HEX", hexBuilder.toString());
-            valueMap.put("DEC", decBuilder.toString());
-            valueMap.put("STR", strBuilder.toString());
+            valueMap.put(HEXADECIMAL_KEY, hexBuilder.toString());
+            valueMap.put(DECIMAL_KEY, decBuilder.toString());
+            valueMap.put(STRING_KEY, strBuilder.toString());
 
             subscriber.onNext(valueMap);
             subscriber.onCompleted();
@@ -46,11 +55,11 @@ public class CharacteristicUtils {
     public static Observable<byte[]> createHexByteValue(final BluetoothGattCharacteristic characteristic, final String hex) {
         return Observable.create(subscriber -> {
             if (!TextUtils.isEmpty(hex) || hex.length() > 1) {
-                String writeHexValue = hex.replaceAll("[^[0-9][a-f]]", "");
+                String writeHexValue = hex.replaceAll(HEXADECIMAL_REGEX, "");
                 byte[] bytes = new byte[(writeHexValue.length() / 2) + 1];
                 int length = bytes.length;
                 for (int i = 0; i < length; ++i) {
-                    bytes[i] = Long.decode("0x" + hex.substring(i * 2, i * 2 + 2)).byteValue();
+                    bytes[i] = Long.decode(HEXADECIMAL_PREFIX + hex.substring(i * 2, i * 2 + 2)).byteValue();
                 }
                 subscriber.onNext(bytes);
                 subscriber.onCompleted();
