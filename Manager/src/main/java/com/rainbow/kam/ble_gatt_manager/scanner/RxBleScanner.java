@@ -61,6 +61,7 @@ public class RxBleScanner {
                 @Override protected void onUnsubscribe() {
                     if (scanner != null && IS_BLE_SUPPORTED && isBleEnabled()) {
                         scanner.stopScan(callback);
+                        scanner = null;
                     }
                 }
             });

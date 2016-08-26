@@ -45,7 +45,13 @@ import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattNotificationC
 import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.NONE_SERVICES;
 import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattResourceNotDiscoveredException.NONE_UUID_CHARACTERISTIC;
 import static com.rainbow.kam.ble_gatt_manager.exceptions.gatt.GattWriteCharacteristicException.NULL_OR_EMPTY_DATA;
-import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.*;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattConnectionOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattIndicateCharacteristicOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattNotifyCharacteristicOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattReadCharacteristicOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattRssiOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattServiceOnSubscribe;
+import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattWriteCharacteristicOnSubscribe;
 
 /**
  * Created by kam6512 on 2015-10-29.
