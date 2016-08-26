@@ -47,6 +47,11 @@ public class BondDeviceBroadcastReceiver implements Observable.OnSubscribe<Bluet
             }
         };
 
+        /*subscriber.add(new MainThreadSubscription() {
+            @Override protected void onUnsubscribe() {
+                context.unregisterReceiver(broadcastReceiver);
+            }
+        });*/
         subscriber.add(Subscriptions.create(() -> context.unregisterReceiver(broadcastReceiver)));
         context.registerReceiver(broadcastReceiver, intentFilter);
     }
