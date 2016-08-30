@@ -24,6 +24,7 @@ public class GattException extends Throwable {
 
     @Override public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("Message", getMessage()).toString();
+                .add("Message", getMessage())
+                .toString();
     }
 }

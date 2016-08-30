@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.WindowManager;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -74,35 +73,11 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQ_CODE_REQUEST_SETTING) {
             checkPermissions(true);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-
-    private void checkPermissions(boolean fromOnActivityResult) {
-        ArrayList<String> needPermissions = new ArrayList<>();
-        boolean showRationale = false;
-
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PERMISSION_GRANTED) {
-                needPermissions.add(permission);
-                showRationale = true;
-            }
-        }
-
-        if (needPermissions.isEmpty()) {
-            permissionGranted();
-        } else if (fromOnActivityResult) {
-            permissionDenied(needPermissions);
-        } else if (showRationale && !TextUtils.isEmpty(explanationMessage)) {
-            showRationaleDialog(needPermissions);
-        } else {
-            requestPermissions(needPermissions);
         }
     }
 
@@ -125,31 +100,59 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
 
+    private void checkPermissions(boolean fromOnActivityResult) {
+        ArrayList<String> needPermissions = new ArrayList<>();
+        boolean showRationale = false;
+
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PERMISSION_GRANTED) {
+                needPermissions.add(permission);
+                showRationale = true;
+            }
+        }
+
+        if (needPermissions.isEmpty()) {
+            permissionGranted();
+        } else if (fromOnActivityResult) {
+            permissionDenied(needPermissions);
+        } else if (showRationale) {
+            showRationaleDialog(needPermissions);
+        } else {
+            requestPermissions(needPermissions);
+        }
+    }
+
+
     private void permissionGranted() {
         AndroidPermission.listener.permissionGranted();
         finish();
-        overridePendingTransition(0, 0);
     }
 
 
     private void permissionDenied(ArrayList<String> deniedPermissions) {
         AndroidPermission.listener.permissionDenied(deniedPermissions);
         finish();
+    }
+
+
+    @Override public void finish() {
+        super.finish();
         overridePendingTransition(0, 0);
     }
 
 
     private void requestPermissions(ArrayList<String> needPermissions) {
-        ActivityCompat.requestPermissions(this, needPermissions.toArray(new String[needPermissions.size()]), REQ_CODE_PERMISSION_REQUEST);
+        ActivityCompat.requestPermissions(this, needPermissions.toArray(new String[needPermissions.size()]),
+                REQ_CODE_PERMISSION_REQUEST);
     }
 
 
     private void showRationaleDialog(final ArrayList<String> needPermissions) {
         new MaterialDialog.Builder(this)
                 .content(explanationMessage)
-                .cancelable(false)
                 .negativeText(explanationConfirmText)
                 .onNegative((dialog, which) -> requestPermissions(needPermissions))
+                .cancelable(false)
                 .show();
     }
 
@@ -157,18 +160,24 @@ public class PermissionActivity extends AppCompatActivity {
     private void showPermissionDenyDialog(final ArrayList<String> deniedPermissions) {
         new MaterialDialog.Builder(this)
                 .content(deniedMessage)
-                .cancelable(false)
                 .positiveText(showSettingButtonText)
-                .onPositive((dialog, which) -> {
-                    Intent intent;
-                    try {
-                        intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:" + packageName));
-                    } catch (ActivityNotFoundException e) {
-                        intent = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
-                    }
-                    startActivityForResult(intent, REQ_CODE_REQUEST_SETTING);
-                })
                 .negativeText(deniedCloseButtonText)
-                .onNegative((dialog, which) -> permissionDenied(deniedPermissions)).show();
+                .onPositive(showAppSettings())
+                .onNegative((dialog, which) -> permissionDenied(deniedPermissions))
+                .cancelable(false)
+                .show();
+    }
+
+
+    private MaterialDialog.SingleButtonCallback showAppSettings() {
+        return (dialog, which) -> {
+            Intent intent;
+            try {
+                intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:" + packageName));
+            } catch (ActivityNotFoundException e) {
+                intent = new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+            }
+            startActivityForResult(intent, REQ_CODE_REQUEST_SETTING);
+        };
     }
 }
