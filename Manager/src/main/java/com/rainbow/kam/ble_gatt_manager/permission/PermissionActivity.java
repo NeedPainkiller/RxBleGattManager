@@ -20,6 +20,7 @@ import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_DENIED_CLOSE;
 import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_DENIED_MSG;
+import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_DENIED_SETTING;
 import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_EXPLANATION_CONFIRM;
 import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_EXPLANATION_MSG;
 import static com.rainbow.kam.ble_gatt_manager.permission.AndroidPermission.KEY_PACKAGE_NAME;
@@ -69,7 +70,7 @@ public class PermissionActivity extends AppCompatActivity {
         explanationConfirmText = permissionBundle.getString(KEY_EXPLANATION_CONFIRM);
         deniedMessage = permissionBundle.getString(KEY_DENIED_MSG);
         deniedCloseButtonText = permissionBundle.getString(KEY_DENIED_CLOSE);
-        showSettingButtonText = permissionBundle.getString(KEY_DENIED_MSG);
+        showSettingButtonText = permissionBundle.getString(KEY_DENIED_SETTING);
     }
 
 
