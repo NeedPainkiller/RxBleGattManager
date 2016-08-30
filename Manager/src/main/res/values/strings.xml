@@ -4,7 +4,7 @@
     <string name="permission_default_message_explanation">we need permission for read contact and find your location</string>
     <string name="permission_default_message_denied">If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]</string>
 
-    <string name="permission_default_setting">Setting</string>
+    <string name="permission_default_setting">Go to Setting</string>
     <string name="permission_default_denied_close">Close</string>
     <string name="permission_default_confirm">Confirm</string>
 </resources>
