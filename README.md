@@ -1,4 +1,4 @@
-# RxBleGattManager [ ![Download](https://api.bintray.com/packages/kam6512/maven/RxBleGattManager/images/download.svg) ](https://bintray.com/kam6512/maven/RxBleGattManager/_latestVersion)
+# RxBleGattManager  [ ![Download](https://api.bintray.com/packages/kam6512/maven/rx-ble-gatt-manager/images/download.svg) ](https://bintray.com/kam6512/maven/rx-ble-gatt-manager/_latestVersion)
 RxBleGattManager is Helper Library for Bluetooth Low Energy Device Scan and Gatt Control operations
 
 
@@ -158,25 +158,25 @@ gattManager.observeIndication(characteristic)
 
 
 ## Download
-<a href='https://bintray.com/kam6512/maven/RxBleGattManager?source=watch' alt='Get automatic notifications about new "RxBleGattManager" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
+<a href='https://bintray.com/kam6512/maven/rx-ble-gatt-manager?source=watch' alt='Get automatic notifications about new "rx-ble-gatt-manager" versions'><img src='https://www.bintray.com/docs/images/bintray_badge_color.png'></a>
 ### Gradle
 
 ```java
-compile 'com.rainbow.library:RxBleGattManager:0.1.5.0'
+compile 'com.orca.library:rx-ble-gatt-manager:1.0.0'
 ```
 ### Maven
 
 ```xml
 <dependency>
-  <groupId>com.rainbow.library</groupId>
-  <artifactId>RxBleGattManager</artifactId>
-  <version>0.1.5.0</version>
+  <groupId>com.orca.library</groupId>
+  <artifactId>rx-ble-gatt-manager</artifactId>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
 ### Ivy
 ```xml
-<dependency org='com.rainbow.library' name='RxBleGattManager' rev='0.1.5.0'>
+<dependency org='com.orca.library' name='rx-ble-gatt-manager' rev='1.0.0'>
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
