@@ -1,6 +1,5 @@
 package com.rainbow.kam.ble_gatt_manager.manager;
 
-import android.app.Application;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -58,7 +57,7 @@ import static com.rainbow.kam.ble_gatt_manager.manager.RxGattListeners.GattWrite
  */
 public class GattManager implements IGattManager {
 
-    private final Application application;
+    private final Context context;
     private final GattManagerCallBack gattManagerCallBack;
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
@@ -72,9 +71,9 @@ public class GattManager implements IGattManager {
     private BluetoothGattCharacteristic currentIndicationCharacteristic;
 
 
-    @Inject public GattManager(final Application application) {
-        Preconditions.checkArgument(application != null, NONE_APPLICATION);
-        this.application = application;
+    @Inject public GattManager(final Context context) {
+        Preconditions.checkArgument(context != null, NONE_APPLICATION);
+        this.context = context;
         this.gattManagerCallBack = new GattManagerCallBack();
         setBluetooth();
     }
@@ -82,7 +81,7 @@ public class GattManager implements IGattManager {
 
     private void setBluetooth() {
         if (bluetoothManager == null || bluetoothAdapter == null) {
-            bluetoothManager = (BluetoothManager) application.getSystemService(Context.BLUETOOTH_SERVICE);
+            bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
             bluetoothAdapter = bluetoothManager.getAdapter();
         }
     }
@@ -96,7 +95,7 @@ public class GattManager implements IGattManager {
     @Override
     public Observable<Boolean> observeConnection(final BleDevice bleDevice) {
         return Observable.create((Observable.OnSubscribe<Boolean>) subscriber -> {
-            if (application == null) {
+            if (context == null) {
                 subscriber.onError(new GattConnectException(NONE_APPLICATION));
             } else {
                 setBluetooth();
@@ -128,7 +127,7 @@ public class GattManager implements IGattManager {
             if (isConnected()) {
                 subscriber.onNext(true);
             } else {
-                bluetoothGatt = this.bleDevice.getDevice().connectGatt(application, false, gattManagerCallBack);
+                bluetoothGatt = this.bleDevice.getDevice().connectGatt(context, false, gattManagerCallBack);
             }
         }).doOnUnsubscribe(() -> gattManagerCallBack.setConnectionListener(null)).doOnUnsubscribe(this::disconnect);
     }
@@ -160,7 +159,7 @@ public class GattManager implements IGattManager {
     @Override public Observable<BluetoothDevice> observeBond()
             throws GattConnectException {
         if (isConnected()) {
-            final BondDeviceBroadcastReceiver receiver = new BondDeviceBroadcastReceiver(application);
+            final BondDeviceBroadcastReceiver receiver = new BondDeviceBroadcastReceiver(context);
             return Observable.create(receiver).doOnSubscribe(() -> bleDevice.getDevice().createBond());
         } else {
             throw new GattConnectException(NOT_CONNECTED);
