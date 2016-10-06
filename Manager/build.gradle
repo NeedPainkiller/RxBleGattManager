@@ -8,10 +8,10 @@ apply plugin: 'com.novoda.bintray-release'
 
 publish {
     userOrg = 'kam6512'
-    groupId = 'com.rainbow.library'
-    artifactId = 'RxBleGattManager'
-    publishVersion = '0.1.5.a'
-    desc = 'Android BLE GATT MANAGER'
+    groupId = 'com.orca.library'
+    artifactId = 'rx-ble-gatt-manager'
+    publishVersion = '1.0.1'
+    desc = 'Android BLE GATT MANAGER with Rx'
     website = 'https://github.com/kam6512/RxBleGattManager'
     issueTracker = "https://github.com/kam6512/RxBleGattManager/issues"
     repository = "https://github.com/kam6512/RxBleGattManager.git"
@@ -62,28 +62,21 @@ dependencies {
     Map<String, String> GoogleDependencies = ext.GoogleDependencies;
     Map<String, String> RxDependencies = ext.RxDependencies;
     Map<String, String> UiDependencies = ext.UiDependencies;
-    Map<String, String> ToolsDependencies = ext.ToolsDependencies;
 
     compile BasicDependencies.FileTree
     testCompile TestDependencies.JUnit
 
-    compile ToolsDependencies.Stetho
-    compile ToolsDependencies.StethoOkHttp
+    compile InjectionDependencies.dagger
+    apt InjectionDependencies.daggerCompilerApt
 
     compile GoogleDependencies.Google_SupportV4
     compile GoogleDependencies.Google_AppCompatV7
-    compile GoogleDependencies.Google_Design
-    compile GoogleDependencies.Google_CardView
-    compile GoogleDependencies.Google_RecyclerView
     compile GoogleDependencies.Google_Annotations
 
     compile GoogleDependencies.Guava
 
     compile RxDependencies.RxJava
     compile RxDependencies.RxAndroid
-
-    compile InjectionDependencies.dagger
-    apt InjectionDependencies.daggerCompilerApt
 
     compile(UiDependencies.MaterialDialogs) {
         transitive = true
