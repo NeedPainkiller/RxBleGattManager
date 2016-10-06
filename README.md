@@ -162,7 +162,7 @@ gattManager.observeIndication(characteristic)
 ### Gradle
 
 ```java
-compile 'com.orca.library:rx-ble-gatt-manager:1.0.0'
+compile 'com.orca.library:rx-ble-gatt-manager:1.0.1'
 ```
 ### Maven
 
@@ -170,16 +170,29 @@ compile 'com.orca.library:rx-ble-gatt-manager:1.0.0'
 <dependency>
   <groupId>com.orca.library</groupId>
   <artifactId>rx-ble-gatt-manager</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <type>pom</type>
 </dependency>
 ```
 ### Ivy
 ```xml
-<dependency org='com.orca.library' name='rx-ble-gatt-manager' rev='1.0.0'>
+<dependency org='com.orca.library' name='rx-ble-gatt-manager' rev='1.0.1'>
   <artifact name='$AID' ext='pom'></artifact>
 </dependency>
 ```
+## Dependencies
+* Google_SupportV4
+* Google_AppCompatV7
+* Google_Annotations
+* Google_Dagger (Dagger 2)
+* Guava
+* RxJava
+* RxAndroid
+* afollestad.material-dialogs
+* Hugo
+* Retrolambda
+* Realm - Java
+* APT Android
 
 ## Developers
 * YoungWon Kang (ywkang@rainbow-wireless.com)
