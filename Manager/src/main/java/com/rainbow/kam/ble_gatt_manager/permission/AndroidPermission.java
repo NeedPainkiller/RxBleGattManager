@@ -42,7 +42,7 @@ public class AndroidPermission {
 
     private final Activity activity;
 
-    public static PermissionListener listener;
+    private static PermissionListener listener;
 
 
     public AndroidPermission(Activity activity) {
@@ -66,70 +66,80 @@ public class AndroidPermission {
 
 
     public AndroidPermission setExplanationMessage(String explanationMessage) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(explanationMessage), "Invalid text for explanationMessage");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(explanationMessage),
+                activity.getString(R.string.permission_exception_message_explanation_text));
         this.explanationMessage = explanationMessage;
         return this;
     }
 
 
     public AndroidPermission setExplanationMessage(@StringRes int explanationMessageResID) {
-        Preconditions.checkArgument(explanationMessageResID > 0, "Invalid value for explanationMessage");
+        Preconditions.checkArgument(explanationMessageResID > 0,
+                activity.getString(R.string.permission_exception_message_explanation_value));
         this.explanationMessage = activity.getString(explanationMessageResID);
         return this;
     }
 
 
-    public AndroidPermission setExplanationConfirmText(String explanationConfirmText) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(explanationConfirmText), "Invalid text for explanationConfirmText");
+    public AndroidPermission setExplanationConfirmButtonText(String explanationConfirmText) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(explanationConfirmText),
+                activity.getString(R.string.permission_exception_button_confirm_text));
         this.explanationConfirmText = explanationConfirmText;
         return this;
     }
 
 
-    public AndroidPermission setExplanationConfirmText(@StringRes int explanationConfirmTextResID) {
-        Preconditions.checkArgument(explanationConfirmTextResID > 0, "Invalid value for explanationConfirmText");
+    public AndroidPermission setExplanationConfirmButtonText(@StringRes int explanationConfirmTextResID) {
+        Preconditions.checkArgument(explanationConfirmTextResID > 0,
+                activity.getString(R.string.permission_exception_button_confirm_text));
         this.explanationConfirmText = activity.getString(explanationConfirmTextResID);
         return this;
     }
 
 
     public AndroidPermission setDeniedMessage(String deniedMessage) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(deniedMessage), "Invalid text for DeniedMessage");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(deniedMessage),
+                activity.getString(R.string.permission_exception_message_denied_text));
         this.deniedMessage = deniedMessage;
         return this;
     }
 
 
     public AndroidPermission setDeniedMessage(@StringRes int deniedMessageResID) {
-        Preconditions.checkArgument(deniedMessageResID > 0, "Invalid value for DeniedMessage");
+        Preconditions.checkArgument(deniedMessageResID > 0,
+                activity.getString(R.string.permission_exception_message_denied_value));
         this.deniedMessage = activity.getString(deniedMessageResID);
         return this;
     }
 
 
     public AndroidPermission setDeniedCloseButtonText(String deniedCloseButtonText) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(deniedCloseButtonText), "Invalid text for DeniedCloseButtonText");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(deniedCloseButtonText),
+                activity.getString(R.string.permission_exception_button_denied_close_text));
         this.deniedCloseButtonText = deniedCloseButtonText;
         return this;
     }
 
 
     public AndroidPermission setDeniedCloseButtonText(@StringRes int deniedCloseButtonTextResID) {
-        Preconditions.checkArgument(deniedCloseButtonTextResID > 0, "Invalid value for DeniedCloseButtonText");
+        Preconditions.checkArgument(deniedCloseButtonTextResID > 0,
+                activity.getString(R.string.permission_exception_button_denied_close_value));
         this.deniedCloseButtonText = activity.getString(deniedCloseButtonTextResID);
         return this;
     }
 
 
     public AndroidPermission setShowSettingButtonText(String showSettingButtonText) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(showSettingButtonText), "Invalid text for ShowSettingButtonText");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(showSettingButtonText),
+                activity.getString(R.string.permission_exception_button_setting_button_text));
         this.showSettingButtonText = showSettingButtonText;
         return this;
     }
 
 
     public AndroidPermission setShowSettingButtonText(@StringRes int showSettingButtonTextResID) {
-        Preconditions.checkArgument(showSettingButtonTextResID > 0, "Invalid value for ShowSettingButtonText");
+        Preconditions.checkArgument(showSettingButtonTextResID > 0,
+                activity.getString(R.string.permission_exception_button_setting_button_value));
         this.showSettingButtonText = activity.getString(showSettingButtonTextResID);
         return this;
     }
@@ -138,7 +148,7 @@ public class AndroidPermission {
     public Observable<ArrayList<String>> check() {
         return Observable.create(subscriber -> {
             if (isEmpty(permissions)) {
-                subscriber.onError(new NullPointerException("You must setPermissions() on AndroidPermission"));
+                subscriber.onError(new NullPointerException(activity.getString(R.string.permission_exception_none_permissions)));
             } else {
                 boolean isGrantedAll = true;
                 for (String permission : this.permissions) {
@@ -163,6 +173,16 @@ public class AndroidPermission {
                 }
             }
         });
+    }
+
+
+    public static void permissionGranted() {
+        listener.permissionGranted();
+    }
+
+
+    public static void permissionDenied(ArrayList<String> deniedPermissions) {
+        listener.permissionDenied(deniedPermissions);
     }
 
 

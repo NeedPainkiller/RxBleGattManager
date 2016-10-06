@@ -76,9 +76,8 @@ public class PermissionActivity extends AppCompatActivity {
     @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQ_CODE_REQUEST_SETTING) {
             checkPermissions(true);
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 
@@ -124,13 +123,13 @@ public class PermissionActivity extends AppCompatActivity {
 
 
     private void permissionGranted() {
-        AndroidPermission.listener.permissionGranted();
+        AndroidPermission.permissionGranted();
         finish();
     }
 
 
     private void permissionDenied(ArrayList<String> deniedPermissions) {
-        AndroidPermission.listener.permissionDenied(deniedPermissions);
+        AndroidPermission.permissionDenied(deniedPermissions);
         finish();
     }
 
