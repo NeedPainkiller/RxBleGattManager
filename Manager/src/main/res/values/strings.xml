@@ -7,4 +7,18 @@
     <string name="permission_default_setting">Go to Setting</string>
     <string name="permission_default_denied_close">Close</string>
     <string name="permission_default_confirm">Confirm</string>
+
+    <string name="permission_exception_none_permissions">You must setPermissions() on AndroidPermission</string>
+
+    <string name="permission_exception_message_explanation_text">Invalid text for ExplanationMessage</string>
+    <string name="permission_exception_message_explanation_value">Invalid value for ExplanationMessage</string>
+    <string name="permission_exception_message_denied_text">Invalid text for DeniedMessage</string>
+    <string name="permission_exception_message_denied_value">Invalid value for DeniedMessage</string>
+
+    <string name="permission_exception_button_confirm_text">Invalid text for explanationConfirmText</string>
+    <string name="permission_exception_button_confirm_value">Invalid value for explanationConfirmText</string>
+    <string name="permission_exception_button_denied_close_text">Invalid text for DeniedCloseButtonText</string>
+    <string name="permission_exception_button_denied_close_value">Invalid value for DeniedCloseButtonText</string>
+    <string name="permission_exception_button_setting_button_text">Invalid text for ShowSettingButtonText</string>
+    <string name="permission_exception_button_setting_button_value">Invalid value for ShowSettingButtonText</string>
 </resources>
