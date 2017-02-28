@@ -194,8 +194,4 @@ compile 'com.orca.library:rx-ble-gatt-manager:1.0.1'
 * Realm - Java
 * APT Android
 
-## Developers
-* YoungWon Kang (ywkang@rainbow-wireless.com)
-* Hyeon Ji  (jihyeon@rainbow-wireless.com)
-
-## Developed by [RainbowWireless](http://www.rainbow-wireless.com/)
+######## Developed by [kam6512](https://kam6512.github.io/)
